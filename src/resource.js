@@ -46,7 +46,9 @@ let res = {
     diamond: "res/Collectable_Items/diamond.png",
 
     rock_00: "res/Collectable_Items/rock_00.png",
-    rock_01: "res/Collectable_Items/rock_01.png"
+    rock_01: "res/Collectable_Items/rock_01.png",
+
+    picked_gold_03: "res/Picked_Item/picked_gold_03.png"
 
 
 };

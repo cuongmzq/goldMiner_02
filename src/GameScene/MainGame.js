@@ -21,6 +21,15 @@ let MainGameLayer = cc.Layer.extend({
     currentHookDirection: 0,
     dropSpeed: 0,
 
+    //Collectable Items - Testing...
+    collectableItems: [],
+
+    gold: null,
+    diamond: null,
+    rock: null,
+
+    picked: false,
+
     ctor()
     {
         this._super();
@@ -37,8 +46,6 @@ let MainGameLayer = cc.Layer.extend({
                 {
                     this.toggleIsDropping();
                 }
-                console.log(this.ropeLength);
-                console.log(this.isDropping);
                 return true;
             },
         }), this)
@@ -81,6 +88,11 @@ let MainGameLayer = cc.Layer.extend({
         this.currentHookDirection = -1;
 
         this.dropSpeed = 4;
+
+    },
+
+    initCollectableItemsGrid()
+    {
 
     },
 
@@ -201,8 +213,24 @@ let MainGameLayer = cc.Layer.extend({
             this.addChild(bg_tile_04);
         }
     },
+
     createCollectableItems()
     {
+        this.gold = cc.Sprite.create(res.gold_03);
+        this.diamond = cc.Sprite.create(res.diamond);
+        this.rock = cc.Sprite.create(res.rock_01);
+
+        this.gold.setPosition(350, 350);
+        this.diamond.setPosition(500, 250);
+        this.rock.setPosition(750, 200);
+
+        this.addChild(this.gold, 5);
+        this.addChild(this.diamond, 5);
+        this.addChild(this.rock, 5);
+
+        this.collectableItems.push(this.gold);
+        this.collectableItems.push(this.diamond);
+        this.collectableItems.push(this.rock);
 
     }
     ,
@@ -254,9 +282,6 @@ let MainGameLayer = cc.Layer.extend({
 
         let rotationAroundPointVector = cc.pRotateByAngle(cc.p(0, -1), cc.p(0, 0), cc.degreesToRadians(this.hookRotation));
 
-        // // this.ropeLength = cc.pDistance(this.ropeOrigin, this.hookRope[0].getPosition());
-        // this.ropeLength = 230;
-
         this.hookRope[0].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(rotationAroundPointVector, this.ropeLength)));
 
         for (let index = 1; index < this.ropeCount; ++index)
@@ -264,25 +289,27 @@ let MainGameLayer = cc.Layer.extend({
             this.hookRope[index].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(rotationAroundPointVector, this.ropeLength - index * 5)));
             this.hookRope[index].setRotation(-this.hookRotation);
 
-            if (this.hookRope[index].y > this.ropeOrigin.y || this.hookRope[index].y < this.hookRope[0].y)
-            {
-                this.hookRope[index].setVisible(false);
-            }
-            else
-            {
-                this.hookRope[index].setVisible(true);
-            }
+            let isWithInHookAndRoll = this.hookRope[index].y <= this.ropeOrigin.y && this.hookRope[index].y >= this.hookRope[0].y;
+
+            this.hookRope[index].setVisible(isWithInHookAndRoll);
+
         }
     },
 
     drop()
     {
+        this.scanning();
+
         if (this.ropeLength >= this.maximumRopeLength)
         {
             this.currentHookDirection = -this.currentHookDirection;
         }
         else if (this.ropeLength < this.minimumRopeLength)
         {
+            this.hookRope[0].setTexture(res.hook);
+
+            this.picked = false;
+
             if (this.isDropping)
             {
                 this.toggleIsDropping();
@@ -299,7 +326,6 @@ let MainGameLayer = cc.Layer.extend({
             this.isDropping = false;
             this.currentHookDirection = 0;
             this.ropeLength = this.minimumRopeLength;
-
             this.hookRotationDirection = this.previousHookRotationDirection;
         }
         else
@@ -310,6 +336,31 @@ let MainGameLayer = cc.Layer.extend({
             this.previousHookRotationDirection = this.hookRotationDirection;
             this.hookRotationDirection = 0;
         }
+    },
+
+    scanning()
+    {
+        for (let item of this.collectableItems)
+        {
+            if (item != null && !this.picked)
+            {
+                let hookBoudingBox = this.hookRope[0].getBoundingBox();
+                let itemBoundingBox = item.getBoundingBox();
+
+                if (cc.rectIntersectsRect(hookBoudingBox, itemBoundingBox))
+                {
+                    if (this.hookRope[0].y <= item.y)
+                    {
+                        this.removeChild(item);
+                        this.hookRope[0].setTexture(res.picked_gold_03);
+                        this.picked = true;
+                        this.currentHookDirection = -1;
+                    }
+                }
+            }
+        }
+
+
     }
 });
 
