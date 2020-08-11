@@ -33,8 +33,12 @@ let MainGameLayer = cc.Layer.extend({
     money: 0,
     upcommingMoney: 0,
 
-    ctor()
-    {
+    //Miner Parts:
+    minerBody: null,
+    minerHead: null,
+    minerArm: null,
+
+    ctor() {
         this._super();
         this.initialization();
         this.createBackground();
@@ -45,8 +49,7 @@ let MainGameLayer = cc.Layer.extend({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
             onTouchBegan: (touch, event) => {
-                if (!this.isDropping)
-                {
+                if (!this.isDropping) {
                     this.toggleIsDropping();
                 }
                 return true;
@@ -56,29 +59,26 @@ let MainGameLayer = cc.Layer.extend({
         this.scheduleUpdate();
     },
 
-    update()
-    {
+    update() {
         this.swing();
 
-        if (this.isDropping)
-        {
+        if (this.isDropping) {
             this.drop();
         }
     },
 
-    initialization()
-    {
+    initialization() {
         this.minimumRopeLength = 50;
         this.maximumRopeLength = 600;
 
         this.rollOrigin = cc.p(cc.winSize.width / 2,
-                                cc.winSize.height / 2 + 160);
+            cc.winSize.height / 2 + 160);
 
         this.ropeOrigin = cc.p(this.rollOrigin.x,
-                            this.rollOrigin.y + 40);
+            this.rollOrigin.y + 40);
 
         this.hookOrigin = cc.p(this.ropeOrigin.x,
-                            this.ropeOrigin.y - this.minimumRopeLength);
+            this.ropeOrigin.y - this.minimumRopeLength);
 
         //Found out that rope tile height is 5 units
         this.ropeCount = this.maximumRopeLength / 5;
@@ -94,13 +94,11 @@ let MainGameLayer = cc.Layer.extend({
 
     },
 
-    initCollectableItemsGrid()
-    {
+    initCollectableItemsGrid() {
 
     },
 
-    createBackground()
-    {
+    createBackground() {
         //Create Brown Under Layer
         let brown_tile = cc.Sprite.create(res.white_tile);
         brown_tile.runAction(cc.tintTo(0, 86, 52, 37));
@@ -116,8 +114,7 @@ let MainGameLayer = cc.Layer.extend({
         this.addChild(purple_tile_01);
 
         let purple_tileCount = cc.winSize.width / purple_tile_01.getContentSize().width;
-        for (let i = 1; i <= purple_tileCount; ++i)
-        {
+        for (let i = 1; i <= purple_tileCount; ++i) {
             let purple_tile = cc.Sprite.create(res.purple_tile);
             purple_tile.setAnchorPoint(0, 1);
             purple_tile.setScale(1, 1.5);
@@ -132,8 +129,7 @@ let MainGameLayer = cc.Layer.extend({
         this.addChild(game_top_bg_01);
 
         let game_top_bgCount = cc.winSize.width / game_top_bg_01.getContentSize().width;
-        for (let i = 1; i <= game_top_bgCount; ++i)
-        {
+        for (let i = 1; i <= game_top_bgCount; ++i) {
             let game_top_bg = cc.Sprite.create(res.game_top_bg);
             game_top_bg.setAnchorPoint(0, 1);
             game_top_bg.setPosition(game_top_bg_01.getContentSize().width * i, cc.winSize.height);
@@ -147,8 +143,7 @@ let MainGameLayer = cc.Layer.extend({
         this.addChild(ground_tile_01);
 
         let ground_tileCount = cc.winSize.width / ground_tile_01.getContentSize().width;
-        for (let i = 1; i <= ground_tileCount; ++i)
-        {
+        for (let i = 1; i <= ground_tileCount; ++i) {
             let ground_tile = cc.Sprite.create(res.ground_tile);
             ground_tile.setAnchorPoint(0, 0.5);
             ground_tile.setPosition(ground_tile_01.getContentSize().width * i, game_top_bg_01.y - game_top_bg_01.getContentSize().height);
@@ -163,8 +158,7 @@ let MainGameLayer = cc.Layer.extend({
         this.addChild(bg_tile_01_01);
 
         let bg_tile_01Count = cc.winSize.width / bg_tile_01_01.getContentSize().width;
-        for (let i = 1; i <= bg_tile_01Count; ++i)
-        {
+        for (let i = 1; i <= bg_tile_01Count; ++i) {
             let bg_tile_01 = cc.Sprite.create(res.bg_tile_01);
             bg_tile_01.setAnchorPoint(0, 0.5);
             bg_tile_01.setPosition(bg_tile_01_01.getContentSize().width * i, ground_tile_01.y / 2);
@@ -178,8 +172,7 @@ let MainGameLayer = cc.Layer.extend({
         this.addChild(bg_tile_02_01);
 
         let bg_tile_02Count = cc.winSize.width / bg_tile_02_01.getContentSize().width;
-        for (let i = 1; i <= bg_tile_02Count; ++i)
-        {
+        for (let i = 1; i <= bg_tile_02Count; ++i) {
             let bg_tile_02 = cc.Sprite.create(res.bg_tile_02);
             bg_tile_02.setAnchorPoint(0, 0.5);
             bg_tile_02.setPosition(bg_tile_02_01.getContentSize().width * i, ground_tile_01.y / 4 * 3);
@@ -193,8 +186,7 @@ let MainGameLayer = cc.Layer.extend({
         this.addChild(bg_tile_03_01);
 
         let bg_tile_03Count = cc.winSize.width / bg_tile_03_01.getContentSize().width;
-        for (let i = 1; i <= bg_tile_03Count; ++i)
-        {
+        for (let i = 1; i <= bg_tile_03Count; ++i) {
             let bg_tile_03 = cc.Sprite.create(res.bg_tile_03);
             bg_tile_03.setAnchorPoint(0, 0.5);
             bg_tile_03.setPosition(bg_tile_03_01.getContentSize().width * i, ground_tile_01.y / 4);
@@ -208,8 +200,7 @@ let MainGameLayer = cc.Layer.extend({
         this.addChild(bg_tile_04_01);
 
         let bg_tile_04Count = cc.winSize.width / bg_tile_04_01.getContentSize().width;
-        for (let i = 1; i <= bg_tile_04Count; ++i)
-        {
+        for (let i = 1; i <= bg_tile_04Count; ++i) {
             let bg_tile_04 = cc.Sprite.create(res.bg_tile_04);
             bg_tile_04.setAnchorPoint(0, 0.75);
             bg_tile_04.setPosition(bg_tile_04_01.getContentSize().width * i, 0);
@@ -217,8 +208,7 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
-    createCollectableItems()
-    {
+    createCollectableItems() {
         // this.gold = cc.Sprite.create(res.gold_03);
         // this.diamond = cc.Sprite.create(res.diamond);
         // this.rock = cc.Sprite.create(res.rock_01);
@@ -235,8 +225,7 @@ let MainGameLayer = cc.Layer.extend({
         // this.collectableItems.push(this.diamond);
         // this.collectableItems.push(this.rock);
         //
-        for (let i = 0; i < 40; ++i)
-        {
+        for (let i = 0; i < 40; ++i) {
             let gold = cc.Sprite.create(res.gold_03);
             let diamond = cc.Sprite.create(res.diamond);
             let rock = cc.Sprite.create(res.rock_01);
@@ -267,8 +256,7 @@ let MainGameLayer = cc.Layer.extend({
     }
     ,
 
-    createRollHookRope()
-    {
+    createRollHookRope() {
         //Create Roll
         let roll = cc.Sprite.create(res.roll);
         roll.setAnchorPoint(0.5, 0);
@@ -290,8 +278,7 @@ let MainGameLayer = cc.Layer.extend({
         rope_hide.setPosition(this.ropeOrigin);
         this.addChild(rope_hide, 6);
 
-        for (let index = 1; index < this.ropeCount; ++index)
-        {
+        for (let index = 1; index < this.ropeCount; ++index) {
             let rope = cc.Sprite.create(res.rope_tile);
             rope.setAnchorPoint(0.5, 1);
             rope.setPosition(cc.p(this.ropeOrigin.x, this.ropeOrigin.y - 5 * index));
@@ -301,12 +288,10 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
-    swing()
-    {
+    swing() {
         this.hookRotation -= this.hookRotationStep * this.hookRotationDirection;
 
-        if (this.hookRotation <= -this.hookMaximumRotationAngle || this.hookRotation >= this.hookMaximumRotationAngle)
-        {
+        if (this.hookRotation <= -this.hookMaximumRotationAngle || this.hookRotation >= this.hookMaximumRotationAngle) {
             this.hookRotationDirection = -this.hookRotationDirection;
         }
 
@@ -316,8 +301,7 @@ let MainGameLayer = cc.Layer.extend({
 
         this.hookRope[0].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(rotationAroundPointVector, this.ropeLength)));
 
-        for (let index = 1; index < this.ropeCount; ++index)
-        {
+        for (let index = 1; index < this.ropeCount; ++index) {
             this.hookRope[index].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(rotationAroundPointVector, this.ropeLength - index * 5)));
             this.hookRope[index].setRotation(-this.hookRotation);
 
@@ -328,28 +312,24 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
-    drop()
-    {
+    drop() {
         this.scanning();
 
-        if (this.ropeLength >= this.maximumRopeLength)
-        {
+        if (this.ropeLength >= this.maximumRopeLength) {
             this.currentHookDirection = -this.currentHookDirection;
-        }
-        else if (this.ropeLength < this.minimumRopeLength)
-        {
-            this.hookRope[0].setTexture(res.hook);
+            this.dropSpeed = 14;
 
-            if (this.picked)
-            {
+        } else if (this.ropeLength < this.minimumRopeLength) {
+            this.hookRope[0].setTexture(res.hook);
+            this.dropSpeed = 6;
+            if (this.picked) {
                 this.money += this.upcommingMoney;
                 this.upcommingMoney = 0;
                 console.log("Money: ", this.money);
                 this.picked = false;
             }
 
-            if (this.isDropping)
-            {
+            if (this.isDropping) {
                 this.toggleIsDropping();
             }
         }
@@ -357,17 +337,13 @@ let MainGameLayer = cc.Layer.extend({
         this.ropeLength += this.dropSpeed * this.currentHookDirection;
     },
 
-    toggleIsDropping()
-    {
-        if (this.isDropping)
-        {
+    toggleIsDropping() {
+        if (this.isDropping) {
             this.isDropping = false;
             this.currentHookDirection = 0;
             this.ropeLength = this.minimumRopeLength;
             this.hookRotationDirection = this.previousHookRotationDirection;
-        }
-        else
-        {
+        } else {
             this.isDropping = true;
             this.currentHookDirection = 1;
 
@@ -376,60 +352,47 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
-    scanning()
-    {
-        // for (let item of this.collectableItems)
-        // {
-        //     if (item != null && !this.picked)
-        //     {
-        //         this.checkCollidedWithCollectableItems(item);
-        //     }
-        // }
-        //
+    scanning() {
         this.collectableItems.forEach(item => {
-            if (item != null && !this.picked)
-            {
+            if (item != null && !this.picked) {
                 this.checkCollidedWithCollectableItems(item);
             }
         });
     },
 
-    checkCollidedWithCollectableItems(item)
-    {
+    checkCollidedWithCollectableItems(item) {
         let hookBoudingBox = this.hookRope[0].getBoundingBox();
         let itemBoundingBox = item.getBoundingBox();
-
-        if (cc.rectIntersectsRect(hookBoudingBox, itemBoundingBox))
-        {
-            if (this.hookRope[0].y <= item.y + hookBoudingBox.height / 3)
-            {
+        if (cc.rectIntersectsRect(hookBoudingBox, itemBoundingBox)) {
+            if (this.hookRope[0].y <= item.y + hookBoudingBox.height / 3) {
                 this.pick(item);
             }
         }
     },
 
-    pick(item)
-    {
-        if (item.getTag() === 1)
-        {
+    pick(item) {
+        if (item.getTag() === 1) {
             this.upcommingMoney = 400;
-            console.log("Gold: +", this.upcommingMoney);
+            this.dropSpeed = 2;
+
+            console.log("Gold: +" + this.upcommingMoney);
             this.hookRope[0].setTexture(res.picked_gold_03);
-        }
-        else if (item.getTag() === 2)
-        {
+        } else if (item.getTag() === 2) {
             this.upcommingMoney = 700;
-            console.log("Diamond: +", this.upcommingMoney);
+            this.dropSpeed = 8;
+
+            console.log("Diamond: +" + this.upcommingMoney);
+
+
             this.hookRope[0].setTexture(res.picked_diamond);
-
-        }
-        else if (item.getTag() === 3)
-        {
+        } else if (item.getTag() === 3) {
             this.upcommingMoney = 50;
-            console.log("Rock: +", this.upcommingMoney);
-            this.hookRope[0].setTexture(res.picked_rock);
+            this.dropSpeed = 1;
 
+            console.log("Rock: +" + this.upcommingMoney);
+            this.hookRope[0].setTexture(res.picked_rock);
         }
+        console.log("Drop Speed: " + this.dropSpeed);
 
         this.removeChild(item);
         this.collectableItems.splice(this.collectableItems.indexOf(item), 1);
@@ -439,9 +402,9 @@ let MainGameLayer = cc.Layer.extend({
 });
 
 let MainGameScene = cc.Scene.extend({
-   onEnter: function () {
-       this._super();
-       let layer = new MainGameLayer();
-       this.addChild(layer);
-   }
+    onEnter: function () {
+        this._super();
+        let layer = new MainGameLayer();
+        this.addChild(layer);
+    }
 });
