@@ -30,6 +30,9 @@ let MainGameLayer = cc.Layer.extend({
 
     picked: false,
 
+    money: 0,
+    upcommingMoney: 0,
+
     ctor()
     {
         this._super();
@@ -66,7 +69,7 @@ let MainGameLayer = cc.Layer.extend({
     initialization()
     {
         this.minimumRopeLength = 50;
-        this.maximumRopeLength = 530;
+        this.maximumRopeLength = 600;
 
         this.rollOrigin = cc.p(cc.winSize.width / 2,
                                 cc.winSize.height / 2 + 160);
@@ -83,11 +86,11 @@ let MainGameLayer = cc.Layer.extend({
 
         this.hookRotation = 0;
         this.hookRotationDirection = 1;
-        this.hookRotationStep = 0.8;
+        this.hookRotationStep = 2;
         this.hookMaximumRotationAngle = 75;
         this.currentHookDirection = -1;
 
-        this.dropSpeed = 4;
+        this.dropSpeed = 6;
 
     },
 
@@ -216,21 +219,50 @@ let MainGameLayer = cc.Layer.extend({
 
     createCollectableItems()
     {
-        this.gold = cc.Sprite.create(res.gold_03);
-        this.diamond = cc.Sprite.create(res.diamond);
-        this.rock = cc.Sprite.create(res.rock_01);
+        // this.gold = cc.Sprite.create(res.gold_03);
+        // this.diamond = cc.Sprite.create(res.diamond);
+        // this.rock = cc.Sprite.create(res.rock_01);
+        //
+        // this.gold.setPosition(350, 350);
+        // this.diamond.setPosition(500, 250);
+        // this.rock.setPosition(750, 200);
+        //
+        // this.addChild(this.gold, 5);
+        // this.addChild(this.diamond, 5);
+        // this.addChild(this.rock, 5);
+        //
+        // this.collectableItems.push(this.gold);
+        // this.collectableItems.push(this.diamond);
+        // this.collectableItems.push(this.rock);
+        //
+        for (let i = 0; i < 40; ++i)
+        {
+            let gold = cc.Sprite.create(res.gold_03);
+            let diamond = cc.Sprite.create(res.diamond);
+            let rock = cc.Sprite.create(res.rock_01);
 
-        this.gold.setPosition(350, 350);
-        this.diamond.setPosition(500, 250);
-        this.rock.setPosition(750, 200);
+            let randomX = Math.random() * (cc.winSize.width - 600) + 300;
+            let randomY = Math.random() * (cc.winSize.height - 350) + 50;
 
-        this.addChild(this.gold, 5);
-        this.addChild(this.diamond, 5);
-        this.addChild(this.rock, 5);
+            gold.setPosition(randomX, randomY);
 
-        this.collectableItems.push(this.gold);
-        this.collectableItems.push(this.diamond);
-        this.collectableItems.push(this.rock);
+            randomX = Math.random() * (cc.winSize.width - 600) + 300;
+            randomY = Math.random() * (cc.winSize.height - 350) + 50;
+
+            diamond.setPosition(randomX, randomY);
+
+            randomX = Math.random() * (cc.winSize.width - 600) + 300;
+            randomY = Math.random() * (cc.winSize.height - 350) + 50;
+            rock.setPosition(randomX, randomY);
+
+            this.addChild(gold, 5, 1);
+            this.addChild(diamond, 5, 2);
+            this.addChild(rock, 5, 3);
+
+            this.collectableItems.push(gold);
+            this.collectableItems.push(diamond);
+            this.collectableItems.push(rock);
+        }
 
     }
     ,
@@ -308,7 +340,13 @@ let MainGameLayer = cc.Layer.extend({
         {
             this.hookRope[0].setTexture(res.hook);
 
-            this.picked = false;
+            if (this.picked)
+            {
+                this.money += this.upcommingMoney;
+                this.upcommingMoney = 0;
+                console.log("Money: ", this.money);
+                this.picked = false;
+            }
 
             if (this.isDropping)
             {
@@ -340,27 +378,63 @@ let MainGameLayer = cc.Layer.extend({
 
     scanning()
     {
-        for (let item of this.collectableItems)
-        {
+        // for (let item of this.collectableItems)
+        // {
+        //     if (item != null && !this.picked)
+        //     {
+        //         this.checkCollidedWithCollectableItems(item);
+        //     }
+        // }
+        //
+        this.collectableItems.forEach(item => {
             if (item != null && !this.picked)
             {
-                let hookBoudingBox = this.hookRope[0].getBoundingBox();
-                let itemBoundingBox = item.getBoundingBox();
+                this.checkCollidedWithCollectableItems(item);
+            }
+        });
+    },
 
-                if (cc.rectIntersectsRect(hookBoudingBox, itemBoundingBox))
-                {
-                    if (this.hookRope[0].y <= item.y)
-                    {
-                        this.removeChild(item);
-                        this.hookRope[0].setTexture(res.picked_gold_03);
-                        this.picked = true;
-                        this.currentHookDirection = -1;
-                    }
-                }
+    checkCollidedWithCollectableItems(item)
+    {
+        let hookBoudingBox = this.hookRope[0].getBoundingBox();
+        let itemBoundingBox = item.getBoundingBox();
+
+        if (cc.rectIntersectsRect(hookBoudingBox, itemBoundingBox))
+        {
+            if (this.hookRope[0].y <= item.y + hookBoudingBox.height / 3)
+            {
+                this.pick(item);
             }
         }
+    },
 
+    pick(item)
+    {
+        if (item.getTag() === 1)
+        {
+            this.upcommingMoney = 400;
+            console.log("Gold: +", this.upcommingMoney);
+            this.hookRope[0].setTexture(res.picked_gold_03);
+        }
+        else if (item.getTag() === 2)
+        {
+            this.upcommingMoney = 700;
+            console.log("Diamond: +", this.upcommingMoney);
+            this.hookRope[0].setTexture(res.picked_diamond);
 
+        }
+        else if (item.getTag() === 3)
+        {
+            this.upcommingMoney = 50;
+            console.log("Rock: +", this.upcommingMoney);
+            this.hookRope[0].setTexture(res.picked_rock);
+
+        }
+
+        this.removeChild(item);
+        this.collectableItems.splice(this.collectableItems.indexOf(item), 1);
+        this.picked = true;
+        this.currentHookDirection = -1;
     }
 });
 
