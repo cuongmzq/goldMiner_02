@@ -100,6 +100,8 @@ let HOOK_ROLL = cc.Node.extend({
     _rotationDirection: -1,
     _rotationLimit: 85,
 
+    previousRotationDirection: 0,
+
     dropSpeed: 0,
 
     ctor: function () {
@@ -143,7 +145,7 @@ let HOOK_ROLL = cc.Node.extend({
                 ropePart.setVisible(false);
             }
 
-            this.ropeHook[i] = ropePart;
+            this.ropeHook.push(ropePart);
 
             this.addChild(this.ropeHook[i], this.layerZOrder);
         }
@@ -169,14 +171,48 @@ let HOOK_ROLL = cc.Node.extend({
         console.log(this.ropePartsCount, this.ropeHook.length);
 
         for (let index = 1; index < this.ropePartsCount; ++index) {
-            this.ropeHook[index].setPosition(cc.pAdd(this.hook.getPosition(), cc.pMult(_rotationVector, this.ropeLength - index * 5)));
+            this.ropeHook[index].setPosition(cc.pAdd(this.roll.getPosition(), cc.pMult(_rotationVector, this.ropeLength - index * 5)));
             this.ropeHook[index].setRotation(-this._rotation);
 
-            let isWithInHookAndRoll = this.ropeHook[index].y <= this.hook.y && this.ropeHook[index].y >= this.ropeHook[0].y;
+            let isWithInHookAndRoll = this.ropeHook[index].y <= this.roll.y && this.ropeHook[index].y >= this.ropeHook[0].y;
 
             this.ropeHook[index].setVisible(isWithInHookAndRoll);
         }
     },
+
+    drop: function () {
+        this.previousRotationDirection = this._rotationDirection;
+        this._rotationDirection = 0;
+    },
+
+    dropping: function() {
+
+    }
+
+    // drop() {
+    //     this.scanning();
+    //
+    //     if (this.ropeLength >= this.maximumRopeLength) {
+    //         this.currentHookDirection = -this.currentHookDirection;
+    //         this.dropSpeed = 14;
+    //
+    //     } else if (this.ropeLength < this.minimumRopeLength) {
+    //         this.hookRope[0].setTexture(res.hook);
+    //         this.dropSpeed = 6;
+    //         if (this.picked) {
+    //             this.money += this.upcommingMoney;
+    //             this.upcommingMoney = 0;
+    //             console.log("Money: ", this.money);
+    //             this.picked = false;
+    //         }
+    //
+    //         if (this.isDropping) {
+    //             this.toggleIsDropping();
+    //         }
+    //     }
+    //
+    //     this.ropeLength += this.dropSpeed * this.currentHookDirection;
+    // },
 });
 
 
@@ -219,16 +255,16 @@ let MainGameLayer = cc.Layer.extend({
         roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
         this.addChild(roll);
 
-        cc.eventManager.addListener(cc.EventListener.create({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            swallowTouches: true,
-            onTouchBegan: () => {
-                if (!this.isDropping) {
-                    this.toggleIsDropping();
-                }
-                return true;
-            },
-        }), this)
+        // cc.eventManager.addListener(cc.EventListener.create({
+        //     event: cc.EventListener.TOUCH_ONE_BY_ONE,
+        //     swallowTouches: true,
+        //     onTouchBegan: () => {
+        //         if (!this.isDropping) {
+        //             this.toggleIsDropping();
+        //         }
+        //         return true;
+        //     },
+        // }), this)
 
         this.scheduleUpdate();
     },
