@@ -122,12 +122,12 @@ let HOOK_ROLL = cc.Node.extend({
 
         this.hookRope[0].setRotation(-this._rotation);
 
-        let _rotationAroundPointVector = cc.pRotateByAngle(cc.p(0, -1), cc.p(0, 0), cc.degreesToRadians(this._rotation));
+        let _rotationVector = cc.pRotateByAngle(cc.p(0, -1), cc.p(0, 0), cc.degreesToRadians(this._rotation));
 
-        this.hookRope[0].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(_rotationAroundPointVector, this.ropeLength)));
+        this.hookRope[0].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(_rotationVector, this.ropeLength)));
 
         for (let index = 1; index < this.ropeCount; ++index) {
-            this.hookRope[index].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(_rotationAroundPointVector, this.ropeLength - index * 5)));
+            this.hookRope[index].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(_rotationVector, this.ropeLength - index * 5)));
             this.hookRope[index].setRotation(-this._rotation);
 
             let isWithInHookAndRoll = this.hookRope[index].y <= this.ropeOrigin.y && this.hookRope[index].y >= this.hookRope[0].y;
@@ -187,13 +187,11 @@ let MainGameLayer = cc.Layer.extend({
         this._super();
         this.initialization();
         this.createBackground();
-        this.createRollHookRope();
+        // this.createRollHookRope();
         this.createGrid();
-        this.createCollectableItems();
+        // this.createCollectableItems();
 
-        let go = new HOOK_ROLL();
-        go.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
-        this.addChild(go);
+        let act = cc.moveBy();
 
         cc.eventManager.addListener(cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
@@ -210,7 +208,7 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     update() {
-        this.swing();
+        // this.swing();
 
         if (this.isDropping) {
             this.drop();
