@@ -97,16 +97,37 @@ let HOOK_ROLL = cc.Node.extend({
     //rotation conflict with built-in variable
     _rotation: 0,
     _rotationStep: 2,
-    _rotationDirection: -1,
+    _rotationDirection: 1,
     _rotationLimit: 85,
 
-    previousRotationDirection: 0,
+    _previousRotationDirection: 0,
 
-    dropSpeed: 0,
+    _dropDirection: 0,
+
+    _dropSpeed: 5,
 
     ctor: function () {
         this._super();
         this.initRollHookRope();
+
+        cc.eventManager.addListener({
+            event: cc.EventListener.TOUCH_ONE_BY_ONE,
+            allowSwallow: true,
+            onTouchBegan: () => {
+                this.drop();
+                return true;
+            },
+
+            onTouchMoved: () => {
+
+            },
+
+            onTouchEnded: () => {
+
+            }
+
+        }, this);
+
         this.scheduleUpdate();
     },
 
@@ -168,8 +189,6 @@ let HOOK_ROLL = cc.Node.extend({
 
         this.ropeHook[0].setPosition(cc.pAdd(this.roll.getPosition(), cc.pMult(_rotationVector, this.ropeLength)));
 
-        console.log(this.ropePartsCount, this.ropeHook.length);
-
         for (let index = 1; index < this.ropePartsCount; ++index) {
             this.ropeHook[index].setPosition(cc.pAdd(this.roll.getPosition(), cc.pMult(_rotationVector, this.ropeLength - index * 5)));
             this.ropeHook[index].setRotation(-this._rotation);
@@ -181,12 +200,33 @@ let HOOK_ROLL = cc.Node.extend({
     },
 
     drop: function () {
-        this.previousRotationDirection = this._rotationDirection;
+        this._previousRotationDirection = this._rotationDirection;
         this._rotationDirection = 0;
+        this._dropDirection = 1;
+
+        this.schedule(function (dt) {
+            this.dropping();
+        }, 0.01, 999, 0, 'dropping');
     },
 
     dropping: function() {
+        this.ropeLength += this._dropSpeed * this._dropDirection;
+        if (this.ropeLength >= this.ropeLengthMax)
+        {
+            this._dropDirection = -1;
+            this._dropSpeed = 8;
+        }
+        else if (this.ropeLength < this.ropeLengthMin)
+        {
+            this.ropeLength = this.ropeLengthMin;
 
+            this._dropDirection = 0;
+            this._dropSpeed = 5;
+
+            this._rotationDirection = this._previousRotationDirection;
+
+            this.unschedule('dropping');
+        }
     }
 
     // drop() {
@@ -217,6 +257,8 @@ let HOOK_ROLL = cc.Node.extend({
 
 
 let MainGameLayer = cc.Layer.extend({
+    roll: null,
+
 
     isDropping: false,
     currentHookDirection: 0,
@@ -247,13 +289,15 @@ let MainGameLayer = cc.Layer.extend({
         this._super();
         this.initialization();
         this.createBackground();
+
+
+        this.roll = new HOOK_ROLL();
+        this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 160);
+        this.addChild(this.roll);
+
         // this.createRollHookRope();
         this.createGrid();
         // this.createCollectableItems();
-
-        let roll = new HOOK_ROLL();
-        roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
-        this.addChild(roll);
 
         // cc.eventManager.addListener(cc.EventListener.create({
         //     event: cc.EventListener.TOUCH_ONE_BY_ONE,
@@ -279,30 +323,6 @@ let MainGameLayer = cc.Layer.extend({
 
     // Init
     initialization() {
-
-        this.minimumRopeLength = 50;
-        this.maximumRopeLength = 600;
-
-        this.rollOrigin = cc.p(cc.winSize.width / 2,
-            cc.winSize.height / 2 + 160);
-
-        this.ropeOrigin = cc.p(this.rollOrigin.x,
-            this.rollOrigin.y + 40);
-
-        this.hookOrigin = cc.p(this.ropeOrigin.x,
-            this.ropeOrigin.y - this.minimumRopeLength);
-
-        //Found out that rope tile height is 5 units
-        this.ropeCount = this.maximumRopeLength / 5;
-        this.ropeLength = this.minimumRopeLength;
-
-        this.hookRotation = 0;
-        this.hookRotationDirection = 1;
-        this.hookRotationStep = 2;
-        this.hookMaximumRotationAngle = 75;
-        this.currentHookDirection = -1;
-
-        this.dropSpeed = 6;
 
     },
 
@@ -417,44 +437,12 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
-    createRollHookRope() {
-        //Create Roll
-        let roll = cc.Sprite.create(res.roll);
-        roll.setAnchorPoint(0.5, 0);
-        roll.setPosition(this.rollOrigin.x - 5, this.rollOrigin.y);
-
-        this.addChild(roll, 5);
-
-        //Create Hook
-        let hook = cc.Sprite.create(res.hook);
-        hook.setAnchorPoint(0.5, 0.9);
-        hook.setPosition(this.hookOrigin);
-
-        this.hookRope[0] = hook;
-        this.addChild(this.hookRope[0], 5);
-
-        //Create Ropes
-        let rope_hide = cc.Sprite.create(res.rope_hide);
-        rope_hide.setAnchorPoint(0.5, 0.5);
-        rope_hide.setPosition(this.ropeOrigin);
-        this.addChild(rope_hide, 6);
-
-        for (let index = 1; index < this.ropeCount; ++index) {
-            let rope = cc.Sprite.create(res.rope_tile);
-            rope.setAnchorPoint(0.5, 1);
-            rope.setPosition(cc.p(this.ropeOrigin.x, this.ropeOrigin.y - 5 * index));
-
-            this.hookRope[index] = rope;
-            this.addChild(this.hookRope[index], 5);
-        }
-    },
-
     createGrid() {
         let countX = 10;
         let countY = 6;
 
         let width = 700;
-        let height = this.hookOrigin.y - 100;
+        let height = this.roll.y - 100;
 
         let paddingX = (cc.winSize.width - width) / 2;
         let paddingYBottom = 100;
