@@ -5,8 +5,82 @@ const C_ITEMS = {
     Gold_03: 4,
     Diamond: 5,
     Rock_00: 6,
-    Rock_01: 7
+    Rock_01: 7,
 };
+
+let C_ITEM = cc.Sprite.extend({
+    sourceSprite: null,
+    pickedHookSprite: null,
+    value: 0,
+    weight: 0,
+    ctor: function (itemEnum) {
+        this._super();
+
+        switch (itemEnum)
+        {
+            case C_ITEMS.Gold_00:
+                this.sourceSprite = res.gold_00;
+                this.pickedHookSprite = res.picked_gold_00;
+                this.value = 50;
+                this.weight = 5;
+                break;
+            case C_ITEMS.Gold_01:
+                this.sourceSprite = res.gold_01;
+                this.pickedHookSprite = res.picked_gold_01;
+                this.value = 150;
+                this.weight = 10;
+                break;
+            case C_ITEMS.Gold_02:
+                this.sourceSprite = res.gold_02;
+                this.pickedHookSprite = res.picked_gold_02;
+                this.value = 350;
+                this.weight = 20;
+                break;
+            case C_ITEMS.Gold_03:
+                this.sourceSprite = res.gold_03;
+                this.pickedHookSprite = res.picked_gold_03;
+                this.value = 500;
+                this.weight = 30;
+                break;
+            case C_ITEMS.Rock_00:
+                this.sourceSprite = res.rock_00;
+                this.pickedHookSprite = res.picked_rock_00;
+                this.value = 20;
+                this.weight = 20;
+                break;
+            case C_ITEMS.Rock_01:
+                this.sourceSprite = res.rock_01;
+                this.pickedHookSprite = res.rock_01;
+                this.value = 50;
+                this.weight = 30;
+                break;
+            case C_ITEMS.Diamond:
+                this.sourceSprite = res.diamond;
+                this.pickedHookSprite = res.diamond;
+                this.value = 850;
+                this.weight = 1;
+                break;
+        }
+
+        this.setTexture(this.sourceSprite);
+        this.zIndex = 5;
+    },
+
+    getValue()
+    {
+        return this.value;
+    },
+
+    getWeight()
+    {
+        return this.weight;
+    },
+
+    getPickedHookSprite()
+    {
+        return this.pickedHookSprite;
+    }
+});
 
 
 let MainGameLayer = cc.Layer.extend({
@@ -64,7 +138,7 @@ let MainGameLayer = cc.Layer.extend({
         cc.eventManager.addListener(cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
-            onTouchBegan: (touch, event) => {
+            onTouchBegan: () => {
                 if (!this.isDropping) {
                     this.toggleIsDropping();
                 }
@@ -75,7 +149,7 @@ let MainGameLayer = cc.Layer.extend({
         this.scheduleUpdate();
     },
 
-    update(dt) {
+    update() {
         this.swing();
 
         if (this.isDropping) {
@@ -85,7 +159,7 @@ let MainGameLayer = cc.Layer.extend({
 
     // Init
     initialization() {
-        
+
         this.minimumRopeLength = 50;
         this.maximumRopeLength = 600;
 
@@ -288,70 +362,23 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createCollectableItems() {
-        let keys = Object.keys(C_ITEMS);
-        this.collectableItemsSlots.forEach((position, index) => {
-            let randomID = Math.round(Math.random() * keys.length);
-            let item = C_ITEMS[keys[randomID]];
+        let item = new C_ITEM(C_ITEMS.Diamond);
+        item.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
+        this.addChild(item);
 
-            let obj = this.createObjectWithTag(this.getResourceC_ITEMS(item), 5, item);
-            obj.setPosition(position);
-            this.collectableItems.push(obj);
+        this.collectableItems.push(item);
 
-            console.log(randomID);
-        });
-    },
-
-
-    //Utilities
-    createObjectWithTag(sprite, zOrder, tag)
-    {
-        let obj = cc.Sprite.create(sprite);
-        this.addChild(obj, zOrder, tag);
-        return obj;
-    },
-    
-    getResourceC_ITEMS (item)
-    {
-      switch (item)
-      {
-          case C_ITEMS.Rock_00:
-              return res.rock_00;
-          case C_ITEMS.Rock_01:
-              return res.rock_01;
-          case C_ITEMS.Gold_00:
-              return res.gold_00;
-          case C_ITEMS.Gold_01:
-              return res.gold_01;
-          case C_ITEMS.Gold_02:
-              return res.gold_02;
-          case C_ITEMS.Gold_03:
-              return res.gold_03;
-          case C_ITEMS.Diamond:
-              return res.diamond;
-      }
-      return null;
-    },
-
-    getResourcePicked_ITEM(item)
-    {
-        switch (item)
-        {
-            case C_ITEMS.Rock_00:
-                return res.picked_rock_00;
-            case C_ITEMS.Rock_01:
-                return res.picked_rock_01;
-            case C_ITEMS.Gold_00:
-                return res.picked_gold_00;
-            case C_ITEMS.Gold_01:
-                return res.picked_gold_01;
-            case C_ITEMS.Gold_02:
-                return res.picked_gold_02;
-            case C_ITEMS.Gold_03:
-                return res.picked_gold_03;
-            case C_ITEMS.Diamond:
-                return res.picked_diamond;
-        }
-        return null;
+        // let keys = Object.keys(C_ITEMS);
+        // this.collectableItemsSlots.forEach((position) => {
+        //     let randomID = Math.round(Math.random() * keys.length);
+        //     let item = C_ITEMS[keys[randomID]];
+        //
+        //     let obj = ;
+        //     obj.setPosition(position);
+        //     this.collectableItems.push(obj);
+        //
+        //     console.log(randomID);
+        // });
     },
 
     swing() {
@@ -444,7 +471,9 @@ let MainGameLayer = cc.Layer.extend({
         * this.hookrope.settexture;
          */
 
-
+        // this.upcommingMoney = item.prototype.value;
+        // this.dropSpeed = item.prototype.dropSpeed;
+        // this.hookRope.setTexture();
 
         this.removeChild(item);
         this.collectableItems.splice(this.collectableItems.indexOf(item), 1);
