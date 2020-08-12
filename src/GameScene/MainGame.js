@@ -361,12 +361,12 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     checkCollidedWithCollectableItems(item) {
-        let hookBoudingBox = this.hookRope[0].getBoundingBox();
-        let itemBoundingBox = item.getBoundingBox();
-        if (cc.rectIntersectsRect(hookBoudingBox, itemBoundingBox)) {
-            if (this.hookRope[0].y <= item.y + hookBoudingBox.height / 3) {
-                this.pick(item);
-            }
+        let distanceToHook = cc.pDistance(this.hookRope[0].getPosition(), item.getPosition());
+        let itemRadius = item.getBoundingBox().width / 2;
+
+        if (distanceToHook <= itemRadius)
+        {
+            this.pick(item);
         }
     },
 
