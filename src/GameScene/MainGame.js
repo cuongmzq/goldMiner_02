@@ -1,3 +1,14 @@
+const C_ITEMS = {
+    Gold_00: 1,
+    Gold_01: 2,
+    Gold_02: 3,
+    Gold_03: 4,
+    Diamond: 5,
+    Rock_00: 6,
+    Rock_01: 7
+};
+
+
 let MainGameLayer = cc.Layer.extend({
     // Array list contains rope tiles and hook (hook index at 0)
     hookRope: [],
@@ -21,6 +32,10 @@ let MainGameLayer = cc.Layer.extend({
     currentHookDirection: 0,
     dropSpeed: 0,
 
+    collectableItemsSlots: [],
+
+    itemType: null,
+
     //Collectable Items - Testing...
     collectableItems: [],
 
@@ -34,15 +49,16 @@ let MainGameLayer = cc.Layer.extend({
     upcommingMoney: 0,
 
     //Miner Parts:
-    minerBody: null,
-    minerHead: null,
-    minerArm: null,
+    // minerBody: null,
+    // minerHead: null,
+    // minerArm: null,
 
     ctor() {
         this._super();
         this.initialization();
         this.createBackground();
         this.createRollHookRope();
+        this.createGrid();
         this.createCollectableItems();
 
         cc.eventManager.addListener(cc.EventListener.create({
@@ -59,7 +75,7 @@ let MainGameLayer = cc.Layer.extend({
         this.scheduleUpdate();
     },
 
-    update() {
+    update(dt) {
         this.swing();
 
         if (this.isDropping) {
@@ -67,7 +83,9 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
+    // Init
     initialization() {
+        
         this.minimumRopeLength = 50;
         this.maximumRopeLength = 600;
 
@@ -94,10 +112,7 @@ let MainGameLayer = cc.Layer.extend({
 
     },
 
-    initCollectableItemsGrid() {
-
-    },
-
+    // Init creation
     createBackground() {
         //Create Brown Under Layer
         let brown_tile = cc.Sprite.create(res.white_tile);
@@ -208,54 +223,6 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
-    createCollectableItems() {
-        // this.gold = cc.Sprite.create(res.gold_03);
-        // this.diamond = cc.Sprite.create(res.diamond);
-        // this.rock = cc.Sprite.create(res.rock_01);
-        //
-        // this.gold.setPosition(350, 350);
-        // this.diamond.setPosition(500, 250);
-        // this.rock.setPosition(750, 200);
-        //
-        // this.addChild(this.gold, 5);
-        // this.addChild(this.diamond, 5);
-        // this.addChild(this.rock, 5);
-        //
-        // this.collectableItems.push(this.gold);
-        // this.collectableItems.push(this.diamond);
-        // this.collectableItems.push(this.rock);
-        //
-        for (let i = 0; i < 40; ++i) {
-            let gold = cc.Sprite.create(res.gold_03);
-            let diamond = cc.Sprite.create(res.diamond);
-            let rock = cc.Sprite.create(res.rock_01);
-
-            let randomX = Math.random() * (cc.winSize.width - 600) + 300;
-            let randomY = Math.random() * (cc.winSize.height - 350) + 50;
-
-            gold.setPosition(randomX, randomY);
-
-            randomX = Math.random() * (cc.winSize.width - 600) + 300;
-            randomY = Math.random() * (cc.winSize.height - 350) + 50;
-
-            diamond.setPosition(randomX, randomY);
-
-            randomX = Math.random() * (cc.winSize.width - 600) + 300;
-            randomY = Math.random() * (cc.winSize.height - 350) + 50;
-            rock.setPosition(randomX, randomY);
-
-            this.addChild(gold, 5, 1);
-            this.addChild(diamond, 5, 2);
-            this.addChild(rock, 5, 3);
-
-            this.collectableItems.push(gold);
-            this.collectableItems.push(diamond);
-            this.collectableItems.push(rock);
-        }
-
-    }
-    ,
-
     createRollHookRope() {
         //Create Roll
         let roll = cc.Sprite.create(res.roll);
@@ -286,6 +253,105 @@ let MainGameLayer = cc.Layer.extend({
             this.hookRope[index] = rope;
             this.addChild(this.hookRope[index], 5);
         }
+    },
+
+    createGrid() {
+        let countX = 10;
+        let countY = 6;
+
+        let width = 700;
+        let height = this.hookOrigin.y - 100;
+
+        let paddingX = (cc.winSize.width - width) / 2;
+        let paddingYBottom = 100;
+
+        let tileWidth = width / countX;
+        let tileHeight = (height - paddingYBottom) / countY;
+
+
+        let firstPoint = cc.p(paddingX + tileWidth / 2, tileHeight / 2 + paddingYBottom);
+
+        for (let row = 0; row < countY; ++row)
+        {
+            for (let column = 0; column < countX; ++column)
+            {
+                let position = cc.p(firstPoint.x + tileWidth * column, firstPoint.y + tileHeight * row);
+
+                //For Testing Overlay
+                let tile = cc.Sprite.create(res.white_tile);
+                tile.setPosition(position);
+                this.addChild(tile, 10);
+
+                this.collectableItemsSlots.push(position);
+            }
+        }
+    },
+
+    createCollectableItems() {
+        let keys = Object.keys(C_ITEMS);
+        this.collectableItemsSlots.forEach((position, index) => {
+            let randomID = Math.round(Math.random() * keys.length);
+            let item = C_ITEMS[keys[randomID]];
+
+            let obj = this.createObjectWithTag(this.getResourceC_ITEMS(item), 5, item);
+            obj.setPosition(position);
+            this.collectableItems.push(obj);
+
+            console.log(randomID);
+        });
+    },
+
+
+    //Utilities
+    createObjectWithTag(sprite, zOrder, tag)
+    {
+        let obj = cc.Sprite.create(sprite);
+        this.addChild(obj, zOrder, tag);
+        return obj;
+    },
+    
+    getResourceC_ITEMS (item)
+    {
+      switch (item)
+      {
+          case C_ITEMS.Rock_00:
+              return res.rock_00;
+          case C_ITEMS.Rock_01:
+              return res.rock_01;
+          case C_ITEMS.Gold_00:
+              return res.gold_00;
+          case C_ITEMS.Gold_01:
+              return res.gold_01;
+          case C_ITEMS.Gold_02:
+              return res.gold_02;
+          case C_ITEMS.Gold_03:
+              return res.gold_03;
+          case C_ITEMS.Diamond:
+              return res.diamond;
+      }
+      return null;
+    },
+
+    getResourcePicked_ITEM(item)
+    {
+        switch (item)
+        {
+            case C_ITEMS.Rock_00:
+                return res.picked_rock_00;
+            case C_ITEMS.Rock_01:
+                return res.picked_rock_01;
+            case C_ITEMS.Gold_00:
+                return res.picked_gold_00;
+            case C_ITEMS.Gold_01:
+                return res.picked_gold_01;
+            case C_ITEMS.Gold_02:
+                return res.picked_gold_02;
+            case C_ITEMS.Gold_03:
+                return res.picked_gold_03;
+            case C_ITEMS.Diamond:
+                return res.picked_diamond;
+        }
+        return null;
     },
 
     swing() {
@@ -371,28 +437,14 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     pick(item) {
-        if (item.getTag() === 1) {
-            this.upcommingMoney = 400;
-            this.dropSpeed = 2;
-
-            console.log("Gold: +" + this.upcommingMoney);
-            this.hookRope[0].setTexture(res.picked_gold_03);
-        } else if (item.getTag() === 2) {
-            this.upcommingMoney = 700;
-            this.dropSpeed = 8;
-
-            console.log("Diamond: +" + this.upcommingMoney);
+        /*
+        *if (item.getTag == C_ITEMS)
+        * this.upcomingmoney;
+        * this.dropSpeed
+        * this.hookrope.settexture;
+         */
 
 
-            this.hookRope[0].setTexture(res.picked_diamond);
-        } else if (item.getTag() === 3) {
-            this.upcommingMoney = 50;
-            this.dropSpeed = 1;
-
-            console.log("Rock: +" + this.upcommingMoney);
-            this.hookRope[0].setTexture(res.picked_rock);
-        }
-        console.log("Drop Speed: " + this.dropSpeed);
 
         this.removeChild(item);
         this.collectableItems.splice(this.collectableItems.indexOf(item), 1);

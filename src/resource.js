@@ -48,9 +48,13 @@ let res = {
     rock_00: "res/Collectable_Items/rock_00.png",
     rock_01: "res/Collectable_Items/rock_01.png",
 
+    picked_gold_00: "res/Picked_Item/picked_gold_00.png",
+    picked_gold_01: "res/Picked_Item/picked_gold_01.png",
+    picked_gold_02: "res/Picked_Item/picked_gold_02.png",
     picked_gold_03: "res/Picked_Item/picked_gold_03.png",
     picked_diamond: "res/Picked_item/picked_diamond.png",
-    picked_rock: "res/Picked_item/picked_rock.png",
+    picked_rock_00: "res/Picked_item/picked_rock_00.png",
+    picked_rock_01: "res/Picked_item/picked_rock_01.png",
 
 
 
