@@ -132,7 +132,7 @@ let HOOK_ROLL = cc.Node.extend({
     },
 
     update: function (dt) {
-        this.swing();
+        this.swinging();
     },
 
     initRollHookRope: function () {
@@ -176,7 +176,7 @@ let HOOK_ROLL = cc.Node.extend({
         this.addChild(ropeHide, this.layerZOrder);
     },
 
-    swing() {
+    swinging() {
         this._rotation -= this._rotationStep * this._rotationDirection;
 
         if (this._rotation <= -this._rotationLimit || this._rotation >= this._rotationLimit) {
@@ -209,7 +209,7 @@ let HOOK_ROLL = cc.Node.extend({
         }, 0.01, 999, 0, 'dropping');
     },
 
-    dropping: function() {
+    dropping: function () {
         this.ropeLength += this._dropSpeed * this._dropDirection;
         if (this.ropeLength >= this.ropeLengthMax)
         {
@@ -227,7 +227,11 @@ let HOOK_ROLL = cc.Node.extend({
 
             this.unschedule('dropping');
         }
-    }
+    },
+
+    scanning: function () {
+
+    },
 
     // drop() {
     //     this.scanning();
@@ -259,45 +263,18 @@ let HOOK_ROLL = cc.Node.extend({
 let MainGameLayer = cc.Layer.extend({
     roll: null,
 
-
-    isDropping: false,
-    currentHookDirection: 0,
-    dropSpeed: 0,
-
     collectableItemsSlots: [],
-
-    itemType: null,
 
     //Collectable Items - Testing...
     collectableItems: [],
 
-    gold: null,
-    diamond: null,
-    rock: null,
-
-    picked: false,
-
-    money: 0,
-    upcommingMoney: 0,
-
-    //Miner Parts:
-    // minerBody: null,
-    // minerHead: null,
-    // minerArm: null,
-
-    ctor() {
+    ctor: function () {
         this._super();
         this.initialization();
+        this.createRoll();
         this.createBackground();
-
-
-        this.roll = new HOOK_ROLL();
-        this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 160);
-        this.addChild(this.roll);
-
-        // this.createRollHookRope();
         this.createGrid();
-        // this.createCollectableItems();
+        this.createCollectableItems();
 
         // cc.eventManager.addListener(cc.EventListener.create({
         //     event: cc.EventListener.TOUCH_ONE_BY_ONE,
@@ -313,21 +290,17 @@ let MainGameLayer = cc.Layer.extend({
         this.scheduleUpdate();
     },
 
-    update() {
-        // this.swing();
+    update: function (dt) {
 
-        if (this.isDropping) {
-            this.drop();
-        }
     },
 
     // Init
-    initialization() {
+    initialization: function () {
 
     },
 
     // Init creation
-    createBackground() {
+    createBackground: function () {
         //Create Brown Under Layer
         let brown_tile = cc.Sprite.create(res.white_tile);
         brown_tile.runAction(cc.tintTo(0, 86, 52, 37));
@@ -437,7 +410,7 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
-    createGrid() {
+    createGrid: function () {
         let countX = 10;
         let countY = 6;
 
@@ -469,101 +442,120 @@ let MainGameLayer = cc.Layer.extend({
         }
     },
 
-    createCollectableItems() {
+    createCollectableItems: function () {
 
 
         let keys = Object.keys(C_ITEMS);
-        this.collectableItemsSlots.forEach((position) => {
+
+        for (let i = 0; i < 10; ++i) {
+            let randomPosID = Math.round(Math.random() * this.collectableItemsSlots.length);
+            console.log(randomPosID);
             let randomID = Math.round(Math.random() * (keys.length - 1));
             let item = C_ITEMS[keys[randomID]];
 
             let collectableItem = new C_ITEM(item);
-            collectableItem.setPosition(position);
+            collectableItem.setPosition(this.collectableItemsSlots[randomPosID]);
+
             this.addChild(collectableItem);
 
             this.collectableItems.push(collectableItem);
-
-            console.log(randomID);
-        });
-    },
-
-
-
-    drop() {
-        this.scanning();
-
-        if (this.ropeLength >= this.maximumRopeLength) {
-            this.currentHookDirection = -this.currentHookDirection;
-            this.dropSpeed = 14;
-
-        } else if (this.ropeLength < this.minimumRopeLength) {
-            this.hookRope[0].setTexture(res.hook);
-            this.dropSpeed = 6;
-            if (this.picked) {
-                this.money += this.upcommingMoney;
-                this.upcommingMoney = 0;
-                console.log("Money: ", this.money);
-                this.picked = false;
-            }
-
-            if (this.isDropping) {
-                this.toggleIsDropping();
-            }
         }
 
-        this.ropeLength += this.dropSpeed * this.currentHookDirection;
+        // this.collectableItemsSlots.forEach((position) => {
+        //     let randomID = Math.round(Math.random() * (6));
+        //     let item = C_ITEMS[keys[randomID]];
+        //
+        //     let collectableItem = new C_ITEM(item);
+        //     collectableItem.setPosition(position);
+        //     this.addChild(collectableItem);
+        //
+        //     this.collectableItems.push(collectableItem);
+        //
+        //     console.log(randomID);
+        // });
     },
 
-    toggleIsDropping() {
-        if (this.isDropping) {
-            this.isDropping = false;
-            this.currentHookDirection = 0;
-            this.ropeLength = this.minimumRopeLength;
-            this.hookRotationDirection = this.previousHookRotationDirection;
-        } else {
-            this.isDropping = true;
-            this.currentHookDirection = 1;
-
-            this.previousHookRotationDirection = this.hookRotationDirection;
-            this.hookRotationDirection = 0;
-        }
+    createRoll: function () {
+        this.roll = new HOOK_ROLL();
+        this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 160);
+        this.addChild(this.roll, 5);
     },
 
-    scanning() {
-        this.collectableItems.forEach(item => {
-            if (item != null && !this.picked) {
-                this.checkCollidedWithCollectableItems(item);
-            }
-        });
-    },
-
-    checkCollidedWithCollectableItems(item) {
-        let distanceToHook = cc.pDistance(this.hookRope[0].getPosition(), item.getPosition());
-        let itemRadius = item.getBoundingBox().width / 2;
-
-        if (distanceToHook <= itemRadius)
-        {
-            this.pick(item);
-        }
-    },
-
-    pick(item) {
-        /*
-        *if (item.getTag == C_ITEMS)
-        * this.upcomingmoney;
-        * this.dropSpeed
-        * this.hookrope.settexture;
-         */
-
-        // this.upcommingMoney = item.prototype.value;
-        // this.dropSpeed = item.prototype.dropSpeed;
-        // this.hookRope.setTexture();
-
-        this.removeChild(item);
-        this.collectableItems.splice(this.collectableItems.indexOf(item), 1);
-        this.picked = true;
-        this.currentHookDirection = -1;
-    }
+    // drop() {
+    //     this.scanning();
+    //
+    //     if (this.ropeLength >= this.maximumRopeLength) {
+    //         this.currentHookDirection = -this.currentHookDirection;
+    //         this.dropSpeed = 14;
+    //
+    //     } else if (this.ropeLength < this.minimumRopeLength) {
+    //         this.hookRope[0].setTexture(res.hook);
+    //         this.dropSpeed = 6;
+    //         if (this.picked) {
+    //             this.money += this.upcommingMoney;
+    //             this.upcommingMoney = 0;
+    //             console.log("Money: ", this.money);
+    //             this.picked = false;
+    //         }
+    //
+    //         if (this.isDropping) {
+    //             this.toggleIsDropping();
+    //         }
+    //     }
+    //
+    //     this.ropeLength += this.dropSpeed * this.currentHookDirection;
+    // },
+    //
+    // toggleIsDropping() {
+    //     if (this.isDropping) {
+    //         this.isDropping = false;
+    //         this.currentHookDirection = 0;
+    //         this.ropeLength = this.minimumRopeLength;
+    //         this.hookRotationDirection = this.previousHookRotationDirection;
+    //     } else {
+    //         this.isDropping = true;
+    //         this.currentHookDirection = 1;
+    //
+    //         this.previousHookRotationDirection = this.hookRotationDirection;
+    //         this.hookRotationDirection = 0;
+    //     }
+    // },
+    //
+    // scanning() {
+    //     this.collectableItems.forEach(item => {
+    //         if (item != null && !this.picked) {
+    //             this.checkCollidedWithCollectableItems(item);
+    //         }
+    //     });
+    // },
+    //
+    // checkCollidedWithCollectableItems(item) {
+    //     let distanceToHook = cc.pDistance(this.hookRope[0].getPosition(), item.getPosition());
+    //     let itemRadius = item.getBoundingBox().width / 2;
+    //
+    //     if (distanceToHook <= itemRadius)
+    //     {
+    //         this.pick(item);
+    //     }
+    // },
+    //
+    // pick(item) {
+    //     /*
+    //     *if (item.getTag == C_ITEMS)
+    //     * this.upcomingmoney;
+    //     * this.dropSpeed
+    //     * this.hookrope.settexture;
+    //      */
+    //
+    //     // this.upcommingMoney = item.prototype.value;
+    //     // this.dropSpeed = item.prototype.dropSpeed;
+    //     // this.hookRope.setTexture();
+    //
+    //     this.removeChild(item);
+    //     this.collectableItems.splice(this.collectableItems.indexOf(item), 1);
+    //     this.picked = true;
+    //     this.currentHookDirection = -1;
+    // }
 });
 
 let MainGameScene = cc.Scene.extend({
