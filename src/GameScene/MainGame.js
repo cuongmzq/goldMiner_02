@@ -13,6 +13,7 @@ let C_ITEM = cc.Sprite.extend({
     pickedHookSprite: "null",
     value: 0,
     weight: 0,
+
     ctor: function (itemEnum) {
         this._super();
 
@@ -83,34 +84,73 @@ let C_ITEM = cc.Sprite.extend({
 });
 
 let HOOK_ROLL = cc.Node.extend({
+    layerZOrder: 5,
     roll: null,
     ropeHook: [],
 
+    ropePartsCount: 0,
+    ropeLength: 0,
+    ropeLengthMin: 50,
+    ropeLengthMax: 500,
+
+
     //rotation conflict with built-in variable
     _rotation: 0,
-    _rotationStep: 0,
-    _rotationDirection: 0,
-    _rotationLimit: 0,
-
-    ropeLength:0,
+    _rotationStep: 2,
+    _rotationDirection: -1,
+    _rotationLimit: 85,
 
     dropSpeed: 0,
 
     ctor: function () {
         this._super();
+        this.initRollHookRope();
+        this.scheduleUpdate();
+    },
 
-        //Test
-        let game01 = new C_ITEM(C_ITEMS.Diamond);
-        let game02 = new C_ITEM(C_ITEMS.Diamond);
-        let game03 = new C_ITEM(C_ITEMS.Diamond);
+    update: function (dt) {
+        this.swing();
+    },
 
-        game01.setPosition(10, 0);
-        game02.setPosition(40, 0);
-        game03.setPosition(80, 0);
+    initRollHookRope: function () {
+        this.ropeLength = this.ropeLengthMin;
 
-        this.addChild(game01, 5);
-        this.addChild(game02, 5);
-        this.addChild(game03, 5);
+        //First
+        this.roll = cc.Sprite.create(res.roll);
+        this.roll.setPosition(0, 0);
+        this.addChild(this.roll, this.layerZOrder);
+
+        //Second: Hook is the first element
+        let hook = cc.Sprite.create(res.hook);
+        hook.setPosition(cc.p(this.roll.x, this.roll.y - 5 * this.ropeLengthMin));
+        hook.setAnchorPoint(0.5, 0.9);
+        this.ropeHook[0] = hook;
+        this.addChild(this.ropeHook[0], this.layerZOrder);
+        console.log(hook.y, this.ropeHook[0].y);
+
+        //Third: 5 is the height of ropeTile Res
+        this.ropePartsCount = this.ropeLengthMax / 5;
+
+        for (let i = 1; i <= this.ropePartsCount; ++i) {
+            let ropePart = cc.Sprite.create(res.rope_tile);
+            let position = cc.p(this.roll.x, this.roll.y - 5 * i);
+
+            ropePart.setAnchorPoint(0.5, 1);
+            ropePart.setPosition(position);
+
+            if (position.y <= this.ropeHook[0].y)
+            {
+                ropePart.setVisible(false);
+            }
+
+            this.ropeHook[i] = ropePart;
+
+            this.addChild(this.ropeHook[i], this.layerZOrder);
+        }
+
+        let ropeHide = cc.Sprite.create(res.rope_hide);
+        ropeHide.setPosition(cc.p(this.roll.x - 2, this.roll.y + 2));
+        this.addChild(ropeHide, this.layerZOrder);
     },
 
     swing() {
@@ -120,43 +160,27 @@ let HOOK_ROLL = cc.Node.extend({
             this._rotationDirection = -this._rotationDirection;
         }
 
-        this.hookRope[0].setRotation(-this._rotation);
+        this.ropeHook[0].setRotation(-this._rotation);
 
         let _rotationVector = cc.pRotateByAngle(cc.p(0, -1), cc.p(0, 0), cc.degreesToRadians(this._rotation));
 
-        this.hookRope[0].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(_rotationVector, this.ropeLength)));
+        this.ropeHook[0].setPosition(cc.pAdd(this.roll.getPosition(), cc.pMult(_rotationVector, this.ropeLength)));
 
-        for (let index = 1; index < this.ropeCount; ++index) {
-            this.hookRope[index].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(_rotationVector, this.ropeLength - index * 5)));
-            this.hookRope[index].setRotation(-this._rotation);
+        console.log(this.ropePartsCount, this.ropeHook.length);
 
-            let isWithInHookAndRoll = this.hookRope[index].y <= this.ropeOrigin.y && this.hookRope[index].y >= this.hookRope[0].y;
+        for (let index = 1; index < this.ropePartsCount; ++index) {
+            this.ropeHook[index].setPosition(cc.pAdd(this.hook.getPosition(), cc.pMult(_rotationVector, this.ropeLength - index * 5)));
+            this.ropeHook[index].setRotation(-this._rotation);
 
-            this.hookRope[index].setVisible(isWithInHookAndRoll);
+            let isWithInHookAndRoll = this.ropeHook[index].y <= this.hook.y && this.ropeHook[index].y >= this.ropeHook[0].y;
 
+            this.ropeHook[index].setVisible(isWithInHookAndRoll);
         }
     },
 });
 
 
 let MainGameLayer = cc.Layer.extend({
-    // Array list contains rope tiles and hook (hook index at 0)
-    hookRope: [],
-
-    rollOrigin: null,
-    ropeOrigin: null,
-    hookOrigin: null,
-
-    ropeCount: 0,
-    ropeLength: 0,
-    maximumRopeLength: 0,
-    minimumRopeLength: 0,
-
-    hookRotation: 0,
-    hookRotationDirection: 0,
-    previousHookRotationDirection: 0,
-    hookRotationStep: 0,
-    hookMaximumRotationAngle: 0,
 
     isDropping: false,
     currentHookDirection: 0,
@@ -191,7 +215,9 @@ let MainGameLayer = cc.Layer.extend({
         this.createGrid();
         // this.createCollectableItems();
 
-        let act = cc.moveBy();
+        let roll = new HOOK_ROLL();
+        roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
+        this.addChild(roll);
 
         cc.eventManager.addListener(cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
