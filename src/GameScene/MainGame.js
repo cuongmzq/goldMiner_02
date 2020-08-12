@@ -9,8 +9,8 @@ const C_ITEMS = {
 };
 
 let C_ITEM = cc.Sprite.extend({
-    sourceSprite: null,
-    pickedHookSprite: null,
+    sourceSprite: "null",
+    pickedHookSprite: "null",
     value: 0,
     weight: 0,
     ctor: function (itemEnum) {
@@ -66,20 +66,76 @@ let C_ITEM = cc.Sprite.extend({
         this.zIndex = 5;
     },
 
-    getValue()
+    getValue: function()
     {
         return this.value;
     },
 
-    getWeight()
+    getWeight: function()
     {
         return this.weight;
     },
 
-    getPickedHookSprite()
+    getPickedHookSprite: function()
     {
         return this.pickedHookSprite;
     }
+});
+
+let HOOK_ROLL = cc.Node.extend({
+    roll: null,
+    ropeHook: [],
+
+    //rotation conflict with built-in variable
+    _rotation: 0,
+    _rotationStep: 0,
+    _rotationDirection: 0,
+    _rotationLimit: 0,
+
+    ropeLength:0,
+
+    dropSpeed: 0,
+
+    ctor: function () {
+        this._super();
+
+        //Test
+        let game01 = new C_ITEM(C_ITEMS.Diamond);
+        let game02 = new C_ITEM(C_ITEMS.Diamond);
+        let game03 = new C_ITEM(C_ITEMS.Diamond);
+
+        game01.setPosition(10, 0);
+        game02.setPosition(40, 0);
+        game03.setPosition(80, 0);
+
+        this.addChild(game01, 5);
+        this.addChild(game02, 5);
+        this.addChild(game03, 5);
+    },
+
+    swing() {
+        this._rotation -= this._rotationStep * this._rotationDirection;
+
+        if (this._rotation <= -this._rotationLimit || this._rotation >= this._rotationLimit) {
+            this._rotationDirection = -this._rotationDirection;
+        }
+
+        this.hookRope[0].setRotation(-this._rotation);
+
+        let _rotationAroundPointVector = cc.pRotateByAngle(cc.p(0, -1), cc.p(0, 0), cc.degreesToRadians(this._rotation));
+
+        this.hookRope[0].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(_rotationAroundPointVector, this.ropeLength)));
+
+        for (let index = 1; index < this.ropeCount; ++index) {
+            this.hookRope[index].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(_rotationAroundPointVector, this.ropeLength - index * 5)));
+            this.hookRope[index].setRotation(-this._rotation);
+
+            let isWithInHookAndRoll = this.hookRope[index].y <= this.ropeOrigin.y && this.hookRope[index].y >= this.hookRope[0].y;
+
+            this.hookRope[index].setVisible(isWithInHookAndRoll);
+
+        }
+    },
 });
 
 
@@ -134,6 +190,10 @@ let MainGameLayer = cc.Layer.extend({
         this.createRollHookRope();
         this.createGrid();
         this.createCollectableItems();
+
+        let go = new HOOK_ROLL();
+        go.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
+        this.addChild(go);
 
         cc.eventManager.addListener(cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
@@ -362,48 +422,24 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createCollectableItems() {
-        let item = new C_ITEM(C_ITEMS.Diamond);
-        item.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
-        this.addChild(item);
 
-        this.collectableItems.push(item);
 
-        // let keys = Object.keys(C_ITEMS);
-        // this.collectableItemsSlots.forEach((position) => {
-        //     let randomID = Math.round(Math.random() * keys.length);
-        //     let item = C_ITEMS[keys[randomID]];
-        //
-        //     let obj = ;
-        //     obj.setPosition(position);
-        //     this.collectableItems.push(obj);
-        //
-        //     console.log(randomID);
-        // });
+        let keys = Object.keys(C_ITEMS);
+        this.collectableItemsSlots.forEach((position) => {
+            let randomID = Math.round(Math.random() * (keys.length - 1));
+            let item = C_ITEMS[keys[randomID]];
+
+            let collectableItem = new C_ITEM(item);
+            collectableItem.setPosition(position);
+            this.addChild(collectableItem);
+
+            this.collectableItems.push(collectableItem);
+
+            console.log(randomID);
+        });
     },
 
-    swing() {
-        this.hookRotation -= this.hookRotationStep * this.hookRotationDirection;
 
-        if (this.hookRotation <= -this.hookMaximumRotationAngle || this.hookRotation >= this.hookMaximumRotationAngle) {
-            this.hookRotationDirection = -this.hookRotationDirection;
-        }
-
-        this.hookRope[0].setRotation(-this.hookRotation);
-
-        let rotationAroundPointVector = cc.pRotateByAngle(cc.p(0, -1), cc.p(0, 0), cc.degreesToRadians(this.hookRotation));
-
-        this.hookRope[0].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(rotationAroundPointVector, this.ropeLength)));
-
-        for (let index = 1; index < this.ropeCount; ++index) {
-            this.hookRope[index].setPosition(cc.pAdd(this.ropeOrigin, cc.pMult(rotationAroundPointVector, this.ropeLength - index * 5)));
-            this.hookRope[index].setRotation(-this.hookRotation);
-
-            let isWithInHookAndRoll = this.hookRope[index].y <= this.ropeOrigin.y && this.hookRope[index].y >= this.hookRope[0].y;
-
-            this.hookRope[index].setVisible(isWithInHookAndRoll);
-
-        }
-    },
 
     drop() {
         this.scanning();
