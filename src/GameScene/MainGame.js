@@ -14,6 +14,12 @@ const C_ITEMS = {
     Mole_diamond: 13
 };
 const LEVEL = {
+
+    LEVEL_00: {
+        ITEMS: [C_ITEMS.Diamond],
+        ITEM_COUNT: 18,
+        TARGET: 650
+    },
     LEVEL_01: {
         ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_02, C_ITEMS.Gold_03, C_ITEMS.Rock_01],
         ITEM_COUNT: 15,
@@ -31,7 +37,7 @@ const LEVEL = {
     }
 };
 
-let LEVELS = [LEVEL.LEVEL_01, LEVEL.LEVEL_02, LEVEL.LEVEL_03];
+let LEVELS = [LEVEL.LEVEL_00];
 
 let collectableItems = [];
 let mainLayerTHIS = null;
@@ -164,6 +170,7 @@ let HOOK_ROLL = cc.Node.extend({
     layerZOrder: 5,
     roll: null,
     ropeHook: [],
+    hookCircleDebug: null,
 
     ropePartsCount: 0,
     ropeLength: 0,
@@ -216,6 +223,9 @@ let HOOK_ROLL = cc.Node.extend({
 
     update: function (dt) {
         this.swinging(dt);
+        this.hookCircleDebug.clear();
+        this.hookCircleDebug.drawCircle(this.ropeHook[0].getPosition(), this.ropeHook[0].getContentSize().width / 2, cc.degreesToRadians(360), 30, true, 5, cc.color(150, 255, 0));
+
     },
 
     initRollHookRope: function () {
@@ -236,6 +246,11 @@ let HOOK_ROLL = cc.Node.extend({
         this.ropeHook[0] = hook;
         this.addChild(this.ropeHook[0], this.layerZOrder);
         console.log(hook.y, this.ropeHook[0].y);
+
+        this.hookCircleDebug = cc.DrawNode.create();
+        this.hookCircleDebug.clear();
+        this.hookCircleDebug.drawCircle(this.ropeHook[0].getPosition(), this.ropeHook[0].getContentSize().width / 2, cc.degreesToRadians(360), 30, true, 5, cc.color(150, 255, 0));
+        this.addChild(this.hookCircleDebug);
 
         //Third: 5 is the height of ropeTile Res
         this.ropePartsCount = this.ropeLengthMax / 5;
@@ -359,7 +374,6 @@ let HOOK_ROLL = cc.Node.extend({
         collectableItemList.forEach((item, index) => {
             if (cc.pDistance(mainLayerTHIS.convertToWorldSpace(item.getPosition()), this.convertToWorldSpace(this.ropeHook[0].getPosition())) <= item.getBoundingBox().width / 2)
             {
-                this.unschedule("scanning");
                 this.pick(item, index);
                 this.toggleReturnDirection();
             }
@@ -378,7 +392,6 @@ let HOOK_ROLL = cc.Node.extend({
         this.pickedItem = item;
 
         console.log("Picked " + item.getName() + " Value: " + item.value + " Weight: " + item.weight);
-
         mainLayerTHIS.removeChild(item);
     },
 });
@@ -414,22 +427,17 @@ let MainGameLayer = cc.Layer.extend({
         this.createCollectableItems();
         this.createUI();
 
-        cc.eventManager.addListener({
-            event: cc.EventListener.KEYBOARD,
-            onKeyPressed: (key) => {
-                if (key === cc.KEY.space && this.passedLevel)
-                {
-                    this.resetLevel();
-                    this.loadNextLevel();
-                }
-            }
-        }, this);
         this.scheduleUpdate();
     },
 
     update: function (dt) {
         this.timer -= dt;
         this.timerUIText.setString("Timer " + parseInt(this.timer));
+        // if (this.timer <= 0)
+        // {
+        //     this.resetLevel();
+        //     this.loadNextLevel();
+        // }
     },
 
     createUI: function () {
@@ -551,8 +559,8 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createGrid: function () {
-        this.countX = 6;
-        this.countY = 4;
+        this.countX = 10;
+        this.countY = 10;
 
         this.gridWidth = 1000;
         this.gridHeight = this.roll.y - 100;
@@ -630,6 +638,7 @@ let MainGameLayer = cc.Layer.extend({
         this.roll._dropSpeed = 5;
         this.roll.pickedItem = null;
         this.passedLevel = false;
+        this.timer = 40;
 
         collectableItems.forEach((item, index) => {
             this.removeChild(item);
