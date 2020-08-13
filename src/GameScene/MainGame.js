@@ -323,18 +323,6 @@ let MainGameLayer = cc.Layer.extend({
         this.createBackground();
         this.createGrid();
         this.createCollectableItems();
-
-        // cc.eventManager.addListener(cc.EventListener.create({
-        //     event: cc.EventListener.TOUCH_ONE_BY_ONE,
-        //     swallowTouches: true,
-        //     onTouchBegan: () => {
-        //         if (!this.isDropping) {
-        //             this.toggleIsDropping();
-        //         }
-        //         return true;
-        //     },
-        // }), this)
-
         this.scheduleUpdate();
     },
 
@@ -493,12 +481,17 @@ let MainGameLayer = cc.Layer.extend({
     createCollectableItems: function () {
 
 
-        let keys = Object.keys(C_ITEMS);
+        let keys = [C_ITEMS.Gold_00, C_ITEMS.Gold_01];
         console.log(this.collectableItemsSlots.length);
+
         for (let i = 0; i < 60; ++i) {
+            //Logging
             console.log(i, this.collectableItemsSlots.length);
+
             let randomPosID = Math.floor(Math.random() * this.collectableItemsSlots.length);
+            //Logging
             console.log(randomPosID, this.collectableItemsSlots[randomPosID]);
+
             let randomID = Math.floor(Math.random() * keys.length);
             let item = C_ITEMS[keys[randomID]];
 
@@ -507,7 +500,9 @@ let MainGameLayer = cc.Layer.extend({
 
             this.collectableItemsSlots.splice(randomPosID, 1);
 
+            //Logging
             console.log(this.collectableItemsSlots[randomPosID]);
+
             let count = 0;
             // if ((randomPosID % this.gridWidth !== 0))
             // {
@@ -537,19 +532,6 @@ let MainGameLayer = cc.Layer.extend({
 
             this.collectableItems.push(collectableItem);
         }
-
-        // this.collectableItemsSlots.forEach((position) => {
-        //     let randomID = Math.round(Math.random() * (6));
-        //     let item = C_ITEMS[keys[randomID]];
-        //
-        //     let collectableItem = new C_ITEM(item);
-        //     collectableItem.setPosition(position);
-        //     this.addChild(collectableItem);
-        //
-        //     this.collectableItems.push(collectableItem);
-        //
-        //     console.log(randomID);
-        // });
     },
 
     createRoll: function () {
