@@ -56,20 +56,20 @@ let res = {
     bag: "res/Collectable_Items/bag.png",
     bone: "res/Collectable_Items/bag.png",
     skull: "res/Collectable_Items/skull.png",
-    fracture: "res/Collectable_Items/fracture.png",
-    mole: "res/Collectable_Items/mole.png",
-    mole_diamond: "res/Collectable_Items/mole_diamond.png",
+    tnt: "res/Collectable_Items/tnt.png",
+    mole_00: "res/Collectable_Items/mole_00.png",
+    mole_diamond_00: "res/Collectable_Items/mole_diamond_00.png",
 
-    picked_diamond: "res/Picked_item/picked_diamond.png",
-    picked_rock_00: "res/Picked_item/picked_rock_00.png",
-    picked_rock_01: "res/Picked_item/picked_rock_01.png",
+    picked_diamond: "res/Picked_Item/picked_diamond.png",
+    picked_rock_00: "res/Picked_Item/picked_rock_00.png",
+    picked_rock_01: "res/Picked_Item/picked_rock_01.png",
 
-    picked_bag: "res/Picked_item/picked_bag.png",
-    picked_bone: "res/Picked_item/picked_bag.png",
-    picked_skull: "res/Picked_item/picked_skull.png",
-    picked_fracture: "res/Picked_item/picked_fracture.png",
-    picked_mole: "res/Picked_item/picked_mole.png",
-    picked_mole_diamond: "res/Picked_item/picked_mole_diamond.png"
+    picked_bag: "res/Picked_Item/picked_bag.png",
+    picked_bone: "res/Picked_Item/picked_bag.png",
+    picked_skull: "res/Picked_Item/picked_skull.png",
+    picked_fracture: "res/Picked_Item/picked_fracture.png",
+    picked_mole: "res/Picked_Item/picked_mole.png",
+    picked_mole_diamond: "res/Picked_Item/picked_mole_diamond.png"
 }
 
 let g_resources = [];

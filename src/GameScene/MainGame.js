@@ -9,7 +9,7 @@ const C_ITEMS = {
     Bag: 8,
     Bone: 9,
     Skull: 10,
-    Fracture: 11,
+    TNT: 11,
     Mole: 12,
     Mole_diamond: 13
 };
@@ -85,20 +85,20 @@ let C_ITEM = cc.Sprite.extend({
                 this.value = 850;
                 this.weight = 1;
                 break;
-            case C_ITEMS.Fracture:
-                this.sourceSprite = res.fracture;
+            case C_ITEMS.TNT:
+                this.sourceSprite = res.tnt;
                 this.pickedHookSprite = res.picked_fracture;
                 this.value = 850;
                 this.weight = 1;
                 break;
             case C_ITEMS.Mole:
-                this.sourceSprite = res.mole;
+                this.sourceSprite = res.mole_00;
                 this.pickedHookSprite = res.picked_mole;
                 this.value = 850;
                 this.weight = 1;
                 break;
             case C_ITEMS.Mole_diamond:
-                this.sourceSprite = res.mole_diamond;
+                this.sourceSprite = res.mole_diamond_00;
                 this.pickedHookSprite = res.picked_mole_diamond;
                 this.value = 850;
                 this.weight = 1;
@@ -485,25 +485,19 @@ let MainGameLayer = cc.Layer.extend({
         console.log(this.collectableItemsSlots.length);
 
         for (let i = 0; i < 60; ++i) {
-            //Logging
-            console.log(i, this.collectableItemsSlots.length);
 
             let randomPosID = Math.floor(Math.random() * this.collectableItemsSlots.length);
-            //Logging
-            console.log(randomPosID, this.collectableItemsSlots[randomPosID]);
 
             let randomID = Math.floor(Math.random() * keys.length);
+
             let item = C_ITEMS[keys[randomID]];
 
             let collectableItem = new C_ITEM(item);
             collectableItem.setPosition(this.collectableItemsSlots[randomPosID]);
 
-            this.collectableItemsSlots.splice(randomPosID, 1);
+            // this.collectableItemsSlots.splice(randomPosID, 1);
 
-            //Logging
-            console.log(this.collectableItemsSlots[randomPosID]);
-
-            let count = 0;
+            // let count = 0;
             // if ((randomPosID % this.gridWidth !== 0))
             // {
             //     console.log(randomPosID);
