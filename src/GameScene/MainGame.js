@@ -16,20 +16,22 @@ const C_ITEMS = {
 const LEVEL = {
     LEVEL_01: {
         ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_02, C_ITEMS.Gold_03, C_ITEMS.Rock_01],
-        ITEM_COUNT: 13,
+        ITEM_COUNT: 15,
         TARGET: 650
     },
     LEVEL_02: {
-        ITEMS: [C_ITEMS.Gold_02, C_ITEMS.Gold_03, C_ITEMS.Diamond],
-        ITEM_COUNT: 16,
+        ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_03, C_ITEMS.Diamond, C_ITEMS.Skull, C_ITEMS.Diamond],
+        ITEM_COUNT: 18,
         TARGET: 950
     },
     LEVEL_03: {
         ITEMS: [C_ITEMS.Gold_03, C_ITEMS.Diamond, C_ITEMS.TNT, C_ITEMS.Bone, C_ITEMS.Mole],
-        ITEM_COUNT: 20,
+        ITEM_COUNT: 24,
         TARGET: 1900
     }
 };
+
+let LEVELS = [LEVEL.LEVEL_01, LEVEL.LEVEL_02, LEVEL.LEVEL_03];
 
 let collectableItems = [];
 let mainLayerTHIS = null;
@@ -352,9 +354,9 @@ let HOOK_ROLL = cc.Node.extend({
         collectableItemList.forEach((item, index) => {
             if (cc.pDistance(mainLayerTHIS.convertToWorldSpace(item.getPosition()), this.convertToWorldSpace(this.ropeHook[0].getPosition())) <= item.getBoundingBox().width / 2)
             {
+                this.unschedule("scanning");
                 this.pick(item, index);
                 this.toggleReturnDirection();
-                this.unschedule("scanning");
             }
         });
     },
@@ -386,7 +388,7 @@ let MainGameLayer = cc.Layer.extend({
     playerMoney: 0,
     playerMoneyIncoming: 0,
 
-    currentLevel: LEVEL.LEVEL_01,
+    currentLevel: null,
 
 
     ctor: function () {
@@ -403,6 +405,10 @@ let MainGameLayer = cc.Layer.extend({
                 if (key === cc.KEY.space)
                 {
                     this.resetLevel();
+                }
+                if (key === cc.KEY.c)
+                {
+                    this.loadNextLevel();
                 }
             }
         }, this);
@@ -525,8 +531,8 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createGrid: function () {
-        this.countX = 10;
-        this.countY = 9;
+        this.countX = 6;
+        this.countY = 4;
 
         this.gridWidth = 1000;
         this.gridHeight = this.roll.y - 100;
@@ -563,7 +569,8 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createCollectableItems: function () {
-        let level = this.currentLevel;
+        let level = LEVELS.shift();
+        this.currentLevel = level;
         let levelKeys = level.ITEMS;
 
         for (let i = 0; i < level.ITEM_COUNT; ++i) {
@@ -582,8 +589,6 @@ let MainGameLayer = cc.Layer.extend({
 
             collectableItems.push(collectableItem);
         }
-
-        console.log(collectableItems);
     },
 
     resetLevel: function () {
@@ -597,9 +602,8 @@ let MainGameLayer = cc.Layer.extend({
 
         collectableItems.forEach((item, index) => {
             this.removeChild(item);
-            collectableItems.splice(index, 1);
         });
-
+        collectableItems = [];
         this.collectableItemsSlots = [];
     },
 
