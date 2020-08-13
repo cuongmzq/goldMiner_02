@@ -53,10 +53,24 @@ let res = {
     picked_gold_02: "res/Picked_Item/picked_gold_02.png",
     picked_gold_03: "res/Picked_Item/picked_gold_03.png",
 
+    bag: "res/Collectable_Items/bag.png",
+    bone: "res/Collectable_Items/bag.png",
+    skull: "res/Collectable_Items/skull.png",
+    fracture: "res/Collectable_Items/fracture.png",
+    mole: "res/Collectable_Items/mole.png",
+    mole_diamond: "res/Collectable_Items/mole_diamond.png",
+
     picked_diamond: "res/Picked_item/picked_diamond.png",
     picked_rock_00: "res/Picked_item/picked_rock_00.png",
     picked_rock_01: "res/Picked_item/picked_rock_01.png",
-};
+
+    picked_bag: "res/Picked_item/picked_bag.png",
+    picked_bone: "res/Picked_item/picked_bag.png",
+    picked_skull: "res/Picked_item/picked_skull.png",
+    picked_fracture: "res/Picked_item/picked_fracture.png",
+    picked_mole: "res/Picked_item/picked_mole.png",
+    picked_mole_diamond: "res/Picked_item/picked_mole_diamond.png"
+}
 
 let g_resources = [];
 for (let i in res) {

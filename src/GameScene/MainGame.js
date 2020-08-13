@@ -61,6 +61,12 @@ let C_ITEM = cc.Sprite.extend({
                 this.value = 850;
                 this.weight = 1;
                 break;
+            case C_ITEMS.Diamond:
+                this.sourceSprite = res.diamond;
+                this.pickedHookSprite = res.diamond;
+                this.value = 850;
+                this.weight = 1;
+                break;
         }
 
         this.setTexture(this.sourceSprite);
@@ -452,35 +458,38 @@ let MainGameLayer = cc.Layer.extend({
 
 
         let keys = Object.keys(C_ITEMS);
-
-        for (let i = 0; i < 15; ++i) {
-            let randomPosID = Math.round(Math.random() * this.collectableItemsSlots.length);
-            console.log(randomPosID);
-            let randomID = Math.round(Math.random() * (keys.length - 1));
+        console.log(this.collectableItemsSlots.length);
+        for (let i = 0; i < 60; ++i) {
+            console.log(i, this.collectableItemsSlots.length);
+            let randomPosID = Math.floor(Math.random() * this.collectableItemsSlots.length);
+            console.log(randomPosID, this.collectableItemsSlots[randomPosID]);
+            let randomID = Math.floor(Math.random() * keys.length);
             let item = C_ITEMS[keys[randomID]];
 
             let collectableItem = new C_ITEM(item);
             collectableItem.setPosition(this.collectableItemsSlots[randomPosID]);
 
+            this.collectableItemsSlots.splice(randomPosID, 1);
+
             console.log(this.collectableItemsSlots[randomPosID]);
             let count = 0;
-            if ((randomPosID % this.gridWidth !== 0))
-            {
-                console.log(randomPosID);
-                this.collectableItemsSlots.splice(randomPosID + 1, 1);
-                this.collectableItemsSlots.splice(randomPosID - 1, 1);
-                ++count;
-                if ((randomPosID < (this.countY - 1) * this.countX) && (randomPosID > this.countX - 1))
-                {
-                    console.log(randomPosID);
-                    this.collectableItemsSlots.splice(randomPosID + this.countX, 1);
-                    this.collectableItemsSlots.splice(randomPosID - this.countX, 1);
-                    ++count;
-                }
-            }
-
-            console.log(this.collectableItemsSlots[randomPosID - count]);
-            this.collectableItemsSlots.splice(randomPosID - 1, 1);
+            // if ((randomPosID % this.gridWidth !== 0))
+            // {
+            //     console.log(randomPosID);
+            //     this.collectableItemsSlots.splice(randomPosID, 1);
+            //     this.collectableItemsSlots.splice(randomPosID - 1, 1);
+            //     ++count;
+            //     // if ((randomPosID < (this.countY - 1) * this.countX) && (randomPosID > this.countX - 1))
+            //     // {
+            //     //     console.log(randomPosID);
+            //     //     this.collectableItemsSlots.splice(randomPosID + this.countX, 1);
+            //     //     this.collectableItemsSlots.splice(randomPosID - this.countX, 1);
+            //     //     ++count;
+            //     // }
+            // }
+            //
+            // console.log(this.collectableItemsSlots[randomPosID - count]);
+            // this.collectableItemsSlots.splice(randomPosID - 1, 1);
 
             // if (item !== C_ITEMS.Diamond) {
             //     for (let j = 0; j < 1; ++j) {
