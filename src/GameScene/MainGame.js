@@ -13,6 +13,20 @@ const C_ITEMS = {
     Mole: 12,
     Mole_diamond: 13
 };
+const LEVEL_ITEMS = {
+    LEVEL_01: {
+        ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_02, C_ITEMS.Gold_03],
+        ITEM_COUNT: 7,
+    },
+    LEVEL_02: {
+        ITEMS: [C_ITEMS.Gold_02, C_ITEMS.Gold_03, C_ITEMS.Diamond],
+        ITEM_COUNT: 12,
+    },
+    LEVEL_03: {
+        ITEMS: [C_ITEMS.Gold_03, C_ITEMS.Diamond, C_ITEMS.TNT, C_ITEMS.Bone, C_ITEMS.Mole],
+        ITEM_COUNT: 20,
+    }
+};
 
 let collectableItems = [];
 let mainLayerTHIS = null;
@@ -32,92 +46,92 @@ let C_ITEM = cc.Sprite.extend({
                 this.sourceSprite = res.gold_00;
                 this.pickedHookSprite = res.picked_gold_00;
                 this.value = 60;
-                this.weight = 5;
-                this.setName("Gold_00")
+                this.weight = 12;
+                this.setName("Gold_00");
                 break;
             case C_ITEMS.Gold_01:
                 this.sourceSprite = res.gold_01;
                 this.pickedHookSprite = res.picked_gold_01;
                 this.value = 150;
-                this.weight = 10
+                this.weight = 15;
                 this.setName("Gold_01");
                 break;
             case C_ITEMS.Gold_02:
                 this.sourceSprite = res.gold_02;
                 this.pickedHookSprite = res.picked_gold_02;
                 this.value = 350;
-                this.weight = 20
+                this.weight = 18;
                 this.setName("Gold_02");
                 break;
             case C_ITEMS.Gold_03:
                 this.sourceSprite = res.gold_03;
                 this.pickedHookSprite = res.picked_gold_03;
                 this.value = 500;
-                this.weight = 30
+                this.weight = 19;
                 this.setName("Gold_03");
                 break;
             case C_ITEMS.Rock_00:
                 this.sourceSprite = res.rock_00;
                 this.pickedHookSprite = res.picked_rock_00;
                 this.value = 20;
-                this.weight = 20
+                this.weight = 17;
                 this.setName("Rock_00");
                 break;
             case C_ITEMS.Rock_01:
                 this.sourceSprite = res.rock_01;
                 this.pickedHookSprite = res.rock_01;
                 this.value = 50;
-                this.weight = 30
+                this.weight = 19;
                 this.setName("Rock_01");
                 break;
             case C_ITEMS.Diamond:
                 this.sourceSprite = res.diamond;
                 this.pickedHookSprite = res.diamond;
                 this.value = 850;
-                this.weight = 1;
-                this.setName("Diamond")
+                this.weight = 8;
+                this.setName("Diamond");
                 break;
             case C_ITEMS.Bag:
                 this.sourceSprite = res.bag;
                 this.pickedHookSprite = res.picked_bag;
-                this.value = 850;
-                this.weight = 1;
-                this.setName("Bag")
+                this.value = Math.floor(Math.random() * 900) ;
+                this.weight = 14;
+                this.setName("Bag");
                 break;
             case C_ITEMS.Bone:
                 this.sourceSprite = res.bone;
                 this.pickedHookSprite = res.picked_bone;
-                this.value = 850;
-                this.weight = 1;
-                this.setName("Bone")
+                this.value = 1;
+                this.weight = 12;
+                this.setName("Bone");
                 break;
             case C_ITEMS.Skull:
                 this.sourceSprite = res.skull;
                 this.pickedHookSprite = res.picked_skull;
-                this.value = 850;
-                this.weight = 1;
-                this.setName("Skull")
+                this.value = 15;
+                this.weight = 10;
+                this.setName("Skull");
                 break;
             case C_ITEMS.TNT:
                 this.sourceSprite = res.tnt;
                 this.pickedHookSprite = res.picked_fracture;
-                this.value = 850;
-                this.weight = 1;
-                this.setName("TNT")
+                this.value = 2;
+                this.weight = 5;
+                this.setName("TNT");
                 break;
             case C_ITEMS.Mole:
                 this.sourceSprite = res.mole_00;
                 this.pickedHookSprite = res.picked_mole;
-                this.value = 850;
-                this.weight = 1;
-                this.setName("Mole")
+                this.value = 5;
+                this.weight = 12;
+                this.setName("Mole");
                 break;
             case C_ITEMS.Mole_diamond:
                 this.sourceSprite = res.mole_diamond_00;
                 this.pickedHookSprite = res.picked_mole_diamond;
-                this.value = 850;
-                this.weight = 1;
-                this.setName("Mole_diamond")
+                this.value = 855;
+                this.weight = 14;
+                this.setName("Mole_diamond");
                 break;
         }
 
@@ -273,14 +287,10 @@ let HOOK_ROLL = cc.Node.extend({
         }
     },
 
-
     drop: function () {
         this._previousRotationDirection = this._rotationDirection;
         this._rotationDirection = 0;
         this._dropDirection = 1;
-
-        // this.ropeLengthMax = ((cc.winSize.width / 2) / Math.abs(Math.cos(cc.degreesToRadians(Math.abs(90 - this._rotation)))));
-        console.log(this.ropeLengthMax);
 
         this.schedule(function (dt) {
             this.dropping(dt);
@@ -330,7 +340,8 @@ let HOOK_ROLL = cc.Node.extend({
         }
         else
         {
-            this._dropSpeed = this.pickedItem.weight;
+            this._dropSpeed = 20 - this.pickedItem.weight;
+            console.log("Speed: " + this._dropSpeed);
         }
     },
 
@@ -338,8 +349,8 @@ let HOOK_ROLL = cc.Node.extend({
         collectableItemList.forEach((item, index) => {
             if (cc.pDistance(mainLayerTHIS.convertToWorldSpace(item.getPosition()), this.convertToWorldSpace(this.ropeHook[0].getPosition())) <= item.getBoundingBox().width / 2)
             {
-                this.toggleReturnDirection();
                 this.pick(item, index);
+                this.toggleReturnDirection();
                 this.unschedule("scanning");
             }
         });
@@ -355,8 +366,6 @@ let HOOK_ROLL = cc.Node.extend({
 
         mainLayerTHIS.removeChild(item);
     },
-
-
 });
 
 
@@ -374,13 +383,12 @@ let MainGameLayer = cc.Layer.extend({
     playerMoney: 0,
     playerMoneyIncoming: 0,
 
-    //Collectable Items - Testing...
+    currentLevel: 0,
 
 
     ctor: function () {
         this._super();
         mainLayerTHIS = this;
-        this.initialization();
         this.createRoll();
         this.createBackground();
         this.createGrid();
@@ -389,14 +397,6 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     update: function (dt) {
-        // A in B
-        // C in D
-        // let aWorldPos = B.convertToWorldSpace(A.getPosition());
-        // let cWorldPos = D.convertToWorldSpace(C.getPosition());
-    },
-
-    // Init
-    initialization: function () {
 
     },
 
@@ -513,13 +513,13 @@ let MainGameLayer = cc.Layer.extend({
 
     createGrid: function () {
         this.countX = 10;
-        this.countY = 6;
+        this.countY = 9;
 
-        this.gridWidth = 900;
+        this.gridWidth = 1000;
         this.gridHeight = this.roll.y - 100;
 
         let paddingX = (cc.winSize.width - this.gridWidth) / 2;
-        let paddingYBottom = 100;
+        let paddingYBottom = 50;
 
         let tileWidth = this.gridWidth / this.countX;
         let tileHeight = (this.gridHeight - paddingYBottom) / this.countY;
@@ -534,24 +534,26 @@ let MainGameLayer = cc.Layer.extend({
                 let position = cc.p(firstPoint.x + tileWidth * column, firstPoint.y + tileHeight * row);
 
                 //For Testing Overlay
-                let tile = cc.Sprite.create(res.white_tile);
-                tile.setPosition(position);
-                this.addChild(tile, 10);
+                // let tile = cc.Sprite.create(res.white_tile);
+                // tile.setPosition(position);
+                // this.addChild(tile, 10);
 
                 this.collectableItemsSlots.push(position);
             }
         }
     },
 
+    createRoll: function () {
+        this.roll = new HOOK_ROLL();
+        this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 160);
+        this.addChild(this.roll, 5);
+    },
+
     createCollectableItems: function () {
+        let level = LEVEL_ITEMS.LEVEL_03;
+        let levelKeys = level.ITEMS;
 
-
-        let keys = Object.keys(C_ITEMS);
-        console.log(keys);
-        let levelKeys = [C_ITEMS.Rock_01, C_ITEMS.Diamond, C_ITEMS.Gold_00];
-        console.log(levelKeys);
-
-        for (let i = 0; i < 40; ++i) {
+        for (let i = 0; i < level.ITEM_COUNT; ++i) {
 
             let randomPosID = Math.floor(Math.random() * this.collectableItemsSlots.length);
             let randomID = Math.floor(Math.random() * (levelKeys.length));
@@ -570,88 +572,6 @@ let MainGameLayer = cc.Layer.extend({
 
         console.log(collectableItems);
     },
-
-    createRoll: function () {
-        this.roll = new HOOK_ROLL();
-        this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 160);
-        this.addChild(this.roll, 5);
-    },
-
-    // drop() {
-    //     this.scanning();
-    //
-    //     if (this.ropeLength >= this.maximumRopeLength) {
-    //         this.currentHookDirection = -this.currentHookDirection;
-    //         this.dropSpeed = 14;
-    //
-    //     } else if (this.ropeLength < this.minimumRopeLength) {
-    //         this.hookRope[0].setTexture(res.hook);
-    //         this.dropSpeed = 6;
-    //         if (this.picked) {
-    //             this.money += this.upcommingMoney;
-    //             this.upcommingMoney = 0;
-    //             console.log("Money: ", this.money);
-    //             this.picked = false;
-    //         }
-    //
-    //         if (this.isDropping) {
-    //             this.toggleIsDropping();
-    //         }
-    //     }
-    //
-    //     this.ropeLength += this.dropSpeed * this.currentHookDirection;
-    // },
-    //
-    // toggleIsDropping() {
-    //     if (this.isDropping) {
-    //         this.isDropping = false;
-    //         this.currentHookDirection = 0;
-    //         this.ropeLength = this.minimumRopeLength;
-    //         this.hookRotationDirection = this.previousHookRotationDirection;
-    //     } else {
-    //         this.isDropping = true;
-    //         this.currentHookDirection = 1;
-    //
-    //         this.previousHookRotationDirection = this.hookRotationDirection;
-    //         this.hookRotationDirection = 0;
-    //     }
-    // },
-    //
-    // scanning() {
-    //     this.collectableItems.forEach(item => {
-    //         if (item != null && !this.picked) {
-    //             this.checkCollidedWithCollectableItems(item);
-    //         }
-    //     });
-    // },
-    //
-    // checkCollidedWithCollectableItems(item) {
-    //     let distanceToHook = cc.pDistance(this.hookRope[0].getPosition(), item.getPosition());
-    //     let itemRadius = item.getBoundingBox().width / 2;
-    //
-    //     if (distanceToHook <= itemRadius)
-    //     {
-    //         this.pick(item);
-    //     }
-    // },
-    //
-    // pick(item) {
-    //     /*
-    //     *if (item.getTag == C_ITEMS)
-    //     * this.upcomingmoney;
-    //     * this.dropSpeed
-    //     * this.hookrope.settexture;
-    //      */
-    //
-    //     // this.upcommingMoney = item.prototype.value;
-    //     // this.dropSpeed = item.prototype.dropSpeed;
-    //     // this.hookRope.setTexture();
-    //
-    //     this.removeChild(item);
-    //     this.collectableItems.splice(this.collectableItems.indexOf(item), 1);
-    //     this.picked = true;
-    //     this.currentHookDirection = -1;
-    // }
 });
 
 let MainGameScene = cc.Scene.extend({

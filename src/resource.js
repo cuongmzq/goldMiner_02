@@ -54,7 +54,7 @@ let res = {
     picked_gold_03: "res/Picked_Item/picked_gold_03.png",
 
     bag: "res/Collectable_Items/bag.png",
-    bone: "res/Collectable_Items/bag.png",
+    bone: "res/Collectable_Items/bone.png",
     skull: "res/Collectable_Items/skull.png",
     tnt: "res/Collectable_Items/tnt.png",
     mole_00: "res/Collectable_Items/mole_00.png",
@@ -65,7 +65,7 @@ let res = {
     picked_rock_01: "res/Picked_Item/picked_rock_01.png",
 
     picked_bag: "res/Picked_Item/picked_bag.png",
-    picked_bone: "res/Picked_Item/picked_bag.png",
+    picked_bone: "res/Picked_Item/picked_bone.png",
     picked_skull: "res/Picked_Item/picked_skull.png",
     picked_fracture: "res/Picked_Item/picked_fracture.png",
     picked_mole: "res/Picked_Item/picked_mole.png",
