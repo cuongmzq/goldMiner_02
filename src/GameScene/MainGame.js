@@ -13,18 +13,21 @@ const C_ITEMS = {
     Mole: 12,
     Mole_diamond: 13
 };
-const LEVEL_ITEMS = {
+const LEVEL = {
     LEVEL_01: {
         ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_02, C_ITEMS.Gold_03],
         ITEM_COUNT: 7,
+        TARGET: 650
     },
     LEVEL_02: {
         ITEMS: [C_ITEMS.Gold_02, C_ITEMS.Gold_03, C_ITEMS.Diamond],
         ITEM_COUNT: 12,
+        TARGET: 950
     },
     LEVEL_03: {
         ITEMS: [C_ITEMS.Gold_03, C_ITEMS.Diamond, C_ITEMS.TNT, C_ITEMS.Bone, C_ITEMS.Mole],
         ITEM_COUNT: 20,
+        TARGET: 1900
     }
 };
 
@@ -46,7 +49,7 @@ let C_ITEM = cc.Sprite.extend({
                 this.sourceSprite = res.gold_00;
                 this.pickedHookSprite = res.picked_gold_00;
                 this.value = 60;
-                this.weight = 12;
+                this.weight = 13;
                 this.setName("Gold_00");
                 break;
             case C_ITEMS.Gold_01:
@@ -88,7 +91,7 @@ let C_ITEM = cc.Sprite.extend({
                 this.sourceSprite = res.diamond;
                 this.pickedHookSprite = res.diamond;
                 this.value = 850;
-                this.weight = 8;
+                this.weight = 14;
                 this.setName("Diamond");
                 break;
             case C_ITEMS.Bag:
@@ -116,7 +119,7 @@ let C_ITEM = cc.Sprite.extend({
                 this.sourceSprite = res.tnt;
                 this.pickedHookSprite = res.picked_fracture;
                 this.value = 2;
-                this.weight = 5;
+                this.weight = 15;
                 this.setName("TNT");
                 break;
             case C_ITEMS.Mole:
@@ -326,7 +329,7 @@ let HOOK_ROLL = cc.Node.extend({
 
     returnedWithPickedItem() {
         mainLayerTHIS.playerMoney += this.pickedItem.value;
-        console.log("+ " + this.pickedItem.value + "Money: " + mainLayerTHIS.playerMoney);
+        console.log("+ " + this.pickedItem.value + " " + "Money: " + mainLayerTHIS.playerMoney);
         this.ropeHook[0].setTexture(res.hook);
         this.pickedItem = null;
         this._dropSpeed = 5;
@@ -358,11 +361,11 @@ let HOOK_ROLL = cc.Node.extend({
 
     pick: function(item, itemIndex) {
         collectableItems.splice(itemIndex, 1);
-        this.ropeHook[0].setTexture(item.pickedHookSprite);
 
+        this.ropeHook[0].setTexture(item.pickedHookSprite);
         this.pickedItem = item;
 
-        console.log("Picked " + item.getName() + " " + item.value + " " + item.weight);
+        console.log("Picked " + item.getName() + " Value: " + item.value + " Weight: " + item.weight);
 
         mainLayerTHIS.removeChild(item);
     },
@@ -383,7 +386,7 @@ let MainGameLayer = cc.Layer.extend({
     playerMoney: 0,
     playerMoneyIncoming: 0,
 
-    currentLevel: 0,
+    currentLevel: LEVEL.LEVEL_01,
 
 
     ctor: function () {
@@ -550,7 +553,7 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createCollectableItems: function () {
-        let level = LEVEL_ITEMS.LEVEL_03;
+        let level = LEVEL.LEVEL_03;
         let levelKeys = level.ITEMS;
 
         for (let i = 0; i < level.ITEM_COUNT; ++i) {
