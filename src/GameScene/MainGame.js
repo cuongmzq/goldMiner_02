@@ -34,10 +34,16 @@ const LEVEL = {
         ITEMS: [C_ITEMS.Gold_03, C_ITEMS.Diamond, C_ITEMS.TNT, C_ITEMS.Bone, C_ITEMS.Mole],
         ITEM_COUNT: 24,
         TARGET: 1900
+    },
+
+    LEVEL_04: {
+        ITEMS: [C_ITEMS.Diamond, C_ITEMS.TNT, C_ITEMS.Bone, C_ITEMS.Mole_diamond],
+        ITEM_COUNT: 13,
+        TARGET: 3900
     }
 };
 
-let LEVELS = [LEVEL.LEVEL_03];
+let LEVELS = [LEVEL.LEVEL_04];
 
 let collectableItems = [];
 let mainLayerTHIS = null;
@@ -350,6 +356,8 @@ let HOOK_ROLL = cc.Node.extend({
         this.ropeHook[0].setTexture(res.hook);
         this.pickedItem = null;
         this._dropSpeed = 5;
+
+        mainLayerTHIS.currentMoneyUIText.setString("Money: " + mainLayerTHIS.playerMoney);
         if (mainLayerTHIS.playerMoney >= mainLayerTHIS.currentLevel.TARGET)
         {
             mainLayerTHIS.passedLevel = true;
@@ -416,35 +424,43 @@ let MainGameLayer = cc.Layer.extend({
     timer: 40,
 
     timerUIText: null,
-
+    currentMoneyUIText: null,
+    targetMoneyUIText: null,
 
     ctor: function () {
         this._super();
         mainLayerTHIS = this;
+        this.createUI();
         this.createRoll();
         this.createBackground();
         this.createGrid();
         this.createCollectableItems();
-        this.createUI();
 
         this.scheduleUpdate();
     },
 
     update: function (dt) {
         this.timer -= dt;
-        this.timerUIText.setString("Timer " + parseInt(this.timer));
-        // if (this.timer <= 0)
-        // {
-        //     this.resetLevel();
-        //     this.loadNextLevel();
-        // }
+        // this.timerUIText.setString("Timer " + parseInt(this.timer));
+        this.timerUIText.setString("");
+
     },
 
     createUI: function () {
        this.timerUIText = new cc.LabelTTF("Timer: ", "Arial", 32 , cc.size(180, 60), cc.TEXT_ALIGNMENT_LEFT, cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
        this.timerUIText.setAnchorPoint(1, 1);
        this.timerUIText.setPosition(cc.winSize.width, cc.winSize.height);
-       this.addChild(this.timerUIText);
+       this.addChild(this.timerUIText, 10);
+
+        this.currentMoneyUIText = new cc.LabelTTF("Money: ", "Arial", 32 , cc.size(400, 60), cc.TEXT_ALIGNMENT_LEFT, cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.currentMoneyUIText.setAnchorPoint(0, 1);
+        this.currentMoneyUIText.setPosition(10, cc.winSize.height);
+        this.addChild(this.currentMoneyUIText, 10);
+
+        this.targetMoneyUIText = new cc.LabelTTF("Target: ", "Arial", 32 , cc.size(400, 60), cc.TEXT_ALIGNMENT_LEFT, cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.targetMoneyUIText.setAnchorPoint(0, 1);
+        this.targetMoneyUIText.setPosition(10, cc.winSize.height - 100);
+        this.addChild(this.targetMoneyUIText, 10);
     },
 
     // Init creation
@@ -600,6 +616,7 @@ let MainGameLayer = cc.Layer.extend({
         let level = LEVELS.shift();
         this.currentLevel = level;
         console.log("TARGET: " + level.TARGET);
+        this.targetMoneyUIText.setString("Target: " + level.TARGET);
         let levelKeys = level.ITEMS;
 
         for (let i = 0; i < level.ITEM_COUNT; ++i) {
