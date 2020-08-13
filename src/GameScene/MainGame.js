@@ -312,10 +312,19 @@ let HOOK_ROLL = cc.Node.extend({
         console.log("+ " + this.pickedItem.value + "Money: " + mainLayerTHIS.playerMoney);
         this.ropeHook[0].setTexture(res.hook);
         this.pickedItem = null;
+        this._dropSpeed = 5;
     },
 
     toggleReturnDirection() {
         this._dropDirection = -1;
+        if (this.pickedItem == null)
+        {
+            this._dropSpeed = 20;
+        }
+        else
+        {
+            this._dropSpeed = this.pickedItem.weight;
+        }
     },
 
     scanning: function (collectableItemList) {
@@ -368,7 +377,7 @@ let MainGameLayer = cc.Layer.extend({
         this.createRoll();
         this.createBackground();
         this.createGrid();
-        // this.createCollectableItems();
+        this.createCollectableItems();
         this.scheduleUpdate();
     },
 
