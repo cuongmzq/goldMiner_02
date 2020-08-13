@@ -40,10 +40,16 @@ const LEVEL = {
         ITEMS: [C_ITEMS.Diamond, C_ITEMS.TNT, C_ITEMS.Bone, C_ITEMS.Mole_diamond],
         ITEM_COUNT: 13,
         TARGET: 3900
-    }
+    },
+    LEVEL_05: {
+        ITEMS: [C_ITEMS.Diamond, C_ITEMS.Diamond, C_ITEMS.Bag, C_ITEMS.Gold_00, C_ITEMS.TNT, C_ITEMS.Bone, C_ITEMS.Mole_diamond],
+        ITEM_COUNT: 40,
+        TARGET: 6900
+    },
+
 };
 
-let LEVELS = [LEVEL.LEVEL_04];
+let LEVELS = [LEVEL.LEVEL_05];
 
 let collectableItems = [];
 let mainLayerTHIS = null;
@@ -608,7 +614,7 @@ let MainGameLayer = cc.Layer.extend({
 
     createRoll: function () {
         this.roll = new HOOK_ROLL();
-        this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 160);
+        this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 200);
         this.addChild(this.roll, 6);
     },
 
