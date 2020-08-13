@@ -196,7 +196,7 @@ let HOOK_ROLL = cc.Node.extend({
     },
 
     update: function (dt) {
-        this.swinging();
+        this.swinging(dt);
     },
 
     initRollHookRope: function () {
@@ -243,8 +243,8 @@ let HOOK_ROLL = cc.Node.extend({
         this.addChild(ropeHide, this.layerZOrder);
     },
 
-    swinging() {
-        this._rotation -= this._rotationStep * this._rotationDirection;
+    swinging(dt) {
+        this._rotation -= this._rotationStep * this._rotationDirection * dt * 60;
 
         if (this._rotation <= -this._rotationLimit || this._rotation >= this._rotationLimit) {
             this._rotationDirection = -this._rotationDirection;
@@ -276,7 +276,7 @@ let HOOK_ROLL = cc.Node.extend({
         console.log(this.ropeLengthMax);
 
         this.schedule(function (dt) {
-            this.dropping();
+            this.dropping(dt);
         }, 0.01, 999, 0, 'dropping');
 
         this.schedule(function (dt) {
@@ -284,8 +284,8 @@ let HOOK_ROLL = cc.Node.extend({
         }, 0.1, 999, 0, 'scanning');
     },
 
-    dropping: function () {
-        this.ropeLength += this._dropSpeed * this._dropDirection;
+    dropping: function (dt) {
+        this.ropeLength += this._dropSpeed * this._dropDirection * dt * 60;
         if (this.ropeLength >= this.ropeLengthMax)
         {
             this.toggleReturnDirection();
