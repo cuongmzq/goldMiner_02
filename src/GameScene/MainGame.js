@@ -14,6 +14,9 @@ const C_ITEMS = {
     Mole_diamond: 13
 };
 
+let collectableItems = [];
+let mainLayerTHIS = null;
+
 let C_ITEM = cc.Sprite.extend({
     sourceSprite: "null",
     pickedHookSprite: "null",
@@ -28,80 +31,93 @@ let C_ITEM = cc.Sprite.extend({
             case C_ITEMS.Gold_00:
                 this.sourceSprite = res.gold_00;
                 this.pickedHookSprite = res.picked_gold_00;
-                this.value = 50;
+                this.value = 60;
                 this.weight = 5;
+                this.setName("Gold_00")
                 break;
             case C_ITEMS.Gold_01:
                 this.sourceSprite = res.gold_01;
                 this.pickedHookSprite = res.picked_gold_01;
                 this.value = 150;
-                this.weight = 10;
+                this.weight = 10
+                this.setName("Gold_01");
                 break;
             case C_ITEMS.Gold_02:
                 this.sourceSprite = res.gold_02;
                 this.pickedHookSprite = res.picked_gold_02;
                 this.value = 350;
-                this.weight = 20;
+                this.weight = 20
+                this.setName("Gold_02");
                 break;
             case C_ITEMS.Gold_03:
                 this.sourceSprite = res.gold_03;
                 this.pickedHookSprite = res.picked_gold_03;
                 this.value = 500;
-                this.weight = 30;
+                this.weight = 30
+                this.setName("Gold_03");
                 break;
             case C_ITEMS.Rock_00:
                 this.sourceSprite = res.rock_00;
                 this.pickedHookSprite = res.picked_rock_00;
                 this.value = 20;
-                this.weight = 20;
+                this.weight = 20
+                this.setName("Rock_00");
                 break;
             case C_ITEMS.Rock_01:
                 this.sourceSprite = res.rock_01;
                 this.pickedHookSprite = res.rock_01;
                 this.value = 50;
-                this.weight = 30;
+                this.weight = 30
+                this.setName("Rock_01");
                 break;
             case C_ITEMS.Diamond:
                 this.sourceSprite = res.diamond;
                 this.pickedHookSprite = res.diamond;
                 this.value = 850;
                 this.weight = 1;
+                this.setName("Diamond")
                 break;
             case C_ITEMS.Bag:
                 this.sourceSprite = res.bag;
                 this.pickedHookSprite = res.picked_bag;
                 this.value = 850;
                 this.weight = 1;
+                this.setName("Bag")
                 break;
             case C_ITEMS.Bone:
                 this.sourceSprite = res.bone;
                 this.pickedHookSprite = res.picked_bone;
                 this.value = 850;
                 this.weight = 1;
+                this.setName("Bone")
                 break;
             case C_ITEMS.Skull:
                 this.sourceSprite = res.skull;
                 this.pickedHookSprite = res.picked_skull;
                 this.value = 850;
                 this.weight = 1;
+                this.setName("Skull")
                 break;
             case C_ITEMS.TNT:
                 this.sourceSprite = res.tnt;
                 this.pickedHookSprite = res.picked_fracture;
                 this.value = 850;
                 this.weight = 1;
+                this.setName("TNT")
                 break;
             case C_ITEMS.Mole:
                 this.sourceSprite = res.mole_00;
                 this.pickedHookSprite = res.picked_mole;
                 this.value = 850;
                 this.weight = 1;
+                this.setName("Mole")
                 break;
             case C_ITEMS.Mole_diamond:
                 this.sourceSprite = res.mole_diamond_00;
                 this.pickedHookSprite = res.picked_mole_diamond;
                 this.value = 850;
                 this.weight = 1;
+                this.setName("Mole_diamond")
                 break;
         }
 
@@ -148,6 +164,8 @@ let HOOK_ROLL = cc.Node.extend({
 
     _dropSpeed: 5,
 
+    pickedItem: null,
+
     ctor: function () {
         this._super();
         this.initRollHookRope();
@@ -156,7 +174,10 @@ let HOOK_ROLL = cc.Node.extend({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             allowSwallow: true,
             onTouchBegan: () => {
-                this.drop();
+                if (this.ropeLength <= this.ropeLengthMin)
+                {
+                    this.drop();
+                }
                 return true;
             },
 
@@ -241,6 +262,7 @@ let HOOK_ROLL = cc.Node.extend({
         }
     },
 
+
     drop: function () {
         this._previousRotationDirection = this._rotationDirection;
         this._rotationDirection = 0;
@@ -249,14 +271,17 @@ let HOOK_ROLL = cc.Node.extend({
         this.schedule(function (dt) {
             this.dropping();
         }, 0.01, 999, 0, 'dropping');
+
+        this.schedule(function (dt) {
+            this.scanning(collectableItems);
+        }, 0.1, 999, 0, 'scanning');
     },
 
     dropping: function () {
         this.ropeLength += this._dropSpeed * this._dropDirection;
         if (this.ropeLength >= this.ropeLengthMax)
         {
-            this._dropDirection = -1;
-            this._dropSpeed = 8;
+            this.toggleReturnDirection();
         }
         else if (this.ropeLength < this.ropeLengthMin)
         {
@@ -266,39 +291,48 @@ let HOOK_ROLL = cc.Node.extend({
             this._dropSpeed = 5;
 
             this._rotationDirection = this._previousRotationDirection;
+            this.unschedule("dropping");
 
-            this.unschedule('dropping');
+            if (this.pickedItem != null)
+            {
+                this.returnedWithPickedItem();
+            }
         }
     },
 
-    scanning: function () {
-
+    returnedWithPickedItem() {
+        mainLayerTHIS.playerMoney += this.pickedItem.value;
+        console.log("+ " + this.pickedItem.value + "Money: " + mainLayerTHIS.playerMoney);
+        this.hookRope[0].setTexture(res.hook);
     },
 
-    // drop() {
-    //     this.scanning();
-    //
-    //     if (this.ropeLength >= this.maximumRopeLength) {
-    //         this.currentHookDirection = -this.currentHookDirection;
-    //         this.dropSpeed = 14;
-    //
-    //     } else if (this.ropeLength < this.minimumRopeLength) {
-    //         this.hookRope[0].setTexture(res.hook);
-    //         this.dropSpeed = 6;
-    //         if (this.picked) {
-    //             this.money += this.upcommingMoney;
-    //             this.upcommingMoney = 0;
-    //             console.log("Money: ", this.money);
-    //             this.picked = false;
-    //         }
-    //
-    //         if (this.isDropping) {
-    //             this.toggleIsDropping();
-    //         }
-    //     }
-    //
-    //     this.ropeLength += this.dropSpeed * this.currentHookDirection;
-    // },
+    toggleReturnDirection() {
+        this._dropDirection = -1;
+    },
+
+    scanning: function (collectableItemList) {
+        collectableItemList.forEach((item, index) => {
+            if (cc.pDistance(mainLayerTHIS.convertToWorldSpace(item.getPosition()), this.convertToWorldSpace(this.ropeHook[0].getPosition())) <= item.getContentSize().width / 2)
+            {
+                this.toggleReturnDirection();
+                this.pick(item, index);
+                this.unschedule("scanning");
+            }
+        });
+    },
+
+    pick: function(item, itemIndex) {
+        collectableItems.splice(itemIndex, 1);
+        this.ropeHook[0].setTexture(item.pickedHookSprite);
+
+        this.pickedItem = item;
+
+        console.log("Picked " + item.getName() + " " + item.value + " " + item.weight);
+
+        mainLayerTHIS.removeChild(item);
+    },
+
+
 });
 
 
@@ -313,11 +347,15 @@ let MainGameLayer = cc.Layer.extend({
 
     collectableItemsSlots: [],
 
+    playerMoney: 0,
+    playerMoneyIncoming: 0,
+
     //Collectable Items - Testing...
-    collectableItems: [],
+
 
     ctor: function () {
         this._super();
+        mainLayerTHIS = this;
         this.initialization();
         this.createRoll();
         this.createBackground();
@@ -327,7 +365,10 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     update: function (dt) {
-
+        // A in B
+        // C in D
+        // let aWorldPos = B.convertToWorldSpace(A.getPosition());
+        // let cWorldPos = D.convertToWorldSpace(C.getPosition());
     },
 
     // Init
@@ -450,7 +491,7 @@ let MainGameLayer = cc.Layer.extend({
         this.countX = 10;
         this.countY = 6;
 
-        this.gridWidth = 700;
+        this.gridWidth = 900;
         this.gridHeight = this.roll.y - 100;
 
         let paddingX = (cc.winSize.width - this.gridWidth) / 2;
@@ -481,51 +522,29 @@ let MainGameLayer = cc.Layer.extend({
     createCollectableItems: function () {
 
 
-        let keys = [C_ITEMS.Gold_00, C_ITEMS.Gold_01];
-        console.log(this.collectableItemsSlots.length);
+        let keys = Object.keys(C_ITEMS);
+        console.log(keys);
+        let levelKeys = [C_ITEMS.Rock_01, C_ITEMS.Diamond, C_ITEMS.Gold_00];
+        console.log(levelKeys);
 
-        for (let i = 0; i < 60; ++i) {
+        for (let i = 0; i < 40; ++i) {
 
             let randomPosID = Math.floor(Math.random() * this.collectableItemsSlots.length);
+            let randomID = Math.floor(Math.random() * (levelKeys.length));
 
-            let randomID = Math.floor(Math.random() * keys.length);
-
-            let item = C_ITEMS[keys[randomID]];
+            let item = levelKeys[randomID];
 
             let collectableItem = new C_ITEM(item);
             collectableItem.setPosition(this.collectableItemsSlots[randomPosID]);
 
-            // this.collectableItemsSlots.splice(randomPosID, 1);
-
-            // let count = 0;
-            // if ((randomPosID % this.gridWidth !== 0))
-            // {
-            //     console.log(randomPosID);
-            //     this.collectableItemsSlots.splice(randomPosID, 1);
-            //     this.collectableItemsSlots.splice(randomPosID - 1, 1);
-            //     ++count;
-            //     // if ((randomPosID < (this.countY - 1) * this.countX) && (randomPosID > this.countX - 1))
-            //     // {
-            //     //     console.log(randomPosID);
-            //     //     this.collectableItemsSlots.splice(randomPosID + this.countX, 1);
-            //     //     this.collectableItemsSlots.splice(randomPosID - this.countX, 1);
-            //     //     ++count;
-            //     // }
-            // }
-            //
-            // console.log(this.collectableItemsSlots[randomPosID - count]);
-            // this.collectableItemsSlots.splice(randomPosID - 1, 1);
-
-            // if (item !== C_ITEMS.Diamond) {
-            //     for (let j = 0; j < 1; ++j) {
-            //
-            //     }
-            // }
+            this.collectableItemsSlots.splice(randomPosID, 1);
 
             this.addChild(collectableItem);
 
-            this.collectableItems.push(collectableItem);
+            collectableItems.push(collectableItem);
         }
+
+        console.log(collectableItems);
     },
 
     createRoll: function () {
