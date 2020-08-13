@@ -364,6 +364,11 @@ let HOOK_ROLL = cc.Node.extend({
                 this.toggleReturnDirection();
             }
         });
+
+
+        // let node = cc.DrawNode();
+        // node.drawCircle(p, 5);
+        // node.clear();
     },
 
     pick: function(item, itemIndex) {
@@ -395,6 +400,9 @@ let MainGameLayer = cc.Layer.extend({
 
     currentLevel: null,
     passedLevel: false,
+    timer: 40,
+
+    timerUIText: null,
 
 
     ctor: function () {
@@ -404,6 +412,7 @@ let MainGameLayer = cc.Layer.extend({
         this.createBackground();
         this.createGrid();
         this.createCollectableItems();
+        this.createUI();
 
         cc.eventManager.addListener({
             event: cc.EventListener.KEYBOARD,
@@ -419,7 +428,15 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     update: function (dt) {
+        this.timer -= dt;
+        this.timerUIText.setString("Timer " + parseInt(this.timer));
+    },
 
+    createUI: function () {
+       this.timerUIText = new cc.LabelTTF("Timer: ", "Arial", 32 , cc.size(180, 60), cc.TEXT_ALIGNMENT_LEFT, cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+       this.timerUIText.setAnchorPoint(1, 1);
+       this.timerUIText.setPosition(cc.winSize.width, cc.winSize.height);
+       this.addChild(this.timerUIText);
     },
 
     // Init creation
@@ -584,8 +601,17 @@ let MainGameLayer = cc.Layer.extend({
 
             let item = levelKeys[randomID];
 
+
+
+
             let collectableItem = new C_ITEM(item);
             collectableItem.setPosition(this.collectableItemsSlots[randomPosID]);
+
+            let drawer = cc.DrawNode.create();
+            drawer.clear();
+            drawer.drawCircle(collectableItem.getPosition(), collectableItem.getContentSize().width / 2, cc.degreesToRadians(360), 30, false, 2, cc.color(255, 0, 9));
+            // drawer.setPosition(collectableItem.getPosition());
+            this.addChild(drawer);
 
             this.collectableItemsSlots.splice(randomPosID, 1);
 
