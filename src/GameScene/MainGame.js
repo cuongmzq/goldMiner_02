@@ -6,6 +6,12 @@ const C_ITEMS = {
     Diamond: 5,
     Rock_00: 6,
     Rock_01: 7,
+    Bag: 8,
+    Bone: 9,
+    Skull: 10,
+    Fracture: 11,
+    Mole: 12,
+    Mole_diamond: 13
 };
 
 let C_ITEM = cc.Sprite.extend({
@@ -61,9 +67,39 @@ let C_ITEM = cc.Sprite.extend({
                 this.value = 850;
                 this.weight = 1;
                 break;
-            case C_ITEMS.Diamond:
-                this.sourceSprite = res.diamond;
-                this.pickedHookSprite = res.diamond;
+            case C_ITEMS.Bag:
+                this.sourceSprite = res.bag;
+                this.pickedHookSprite = res.picked_bag;
+                this.value = 850;
+                this.weight = 1;
+                break;
+            case C_ITEMS.Bone:
+                this.sourceSprite = res.bone;
+                this.pickedHookSprite = res.picked_bone;
+                this.value = 850;
+                this.weight = 1;
+                break;
+            case C_ITEMS.Skull:
+                this.sourceSprite = res.skull;
+                this.pickedHookSprite = res.picked_skull;
+                this.value = 850;
+                this.weight = 1;
+                break;
+            case C_ITEMS.Fracture:
+                this.sourceSprite = res.fracture;
+                this.pickedHookSprite = res.picked_fracture;
+                this.value = 850;
+                this.weight = 1;
+                break;
+            case C_ITEMS.Mole:
+                this.sourceSprite = res.mole;
+                this.pickedHookSprite = res.picked_mole;
+                this.value = 850;
+                this.weight = 1;
+                break;
+            case C_ITEMS.Mole_diamond:
+                this.sourceSprite = res.mole_diamond;
+                this.pickedHookSprite = res.picked_mole_diamond;
                 this.value = 850;
                 this.weight = 1;
                 break;
