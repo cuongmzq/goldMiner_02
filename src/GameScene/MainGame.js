@@ -17,7 +17,7 @@ const LEVEL = {
 
     LEVEL_00: {
         ITEMS: [C_ITEMS.Diamond],
-        ITEM_COUNT: 18,
+        ITEM_COUNT: 99,
         TARGET: 650
     },
     LEVEL_01: {
@@ -37,7 +37,7 @@ const LEVEL = {
     }
 };
 
-let LEVELS = [LEVEL.LEVEL_00];
+let LEVELS = [LEVEL.LEVEL_03];
 
 let collectableItems = [];
 let mainLayerTHIS = null;
@@ -244,7 +244,7 @@ let HOOK_ROLL = cc.Node.extend({
         hook.setPosition(cc.p(this.roll.x, this.roll.y - 5 * this.ropeLengthMin));
         hook.setAnchorPoint(0.5, 0.9);
         this.ropeHook[0] = hook;
-        this.addChild(this.ropeHook[0], this.layerZOrder);
+        this.addChild(this.ropeHook[0], this.layerZOrder + 1);
         console.log(hook.y, this.ropeHook[0].y);
 
         this.hookCircleDebug = cc.DrawNode.create();
@@ -559,7 +559,7 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createGrid: function () {
-        this.countX = 10;
+        this.countX = 15;
         this.countY = 10;
 
         this.gridWidth = 1000;
@@ -593,7 +593,7 @@ let MainGameLayer = cc.Layer.extend({
     createRoll: function () {
         this.roll = new HOOK_ROLL();
         this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 160);
-        this.addChild(this.roll, 5);
+        this.addChild(this.roll, 6);
     },
 
     createCollectableItems: function () {
