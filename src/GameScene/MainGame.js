@@ -246,7 +246,14 @@ let HOOK_ROLL = cc.Node.extend({
     swinging(dt) {
         this._rotation -= this._rotationStep * this._rotationDirection * dt * 60;
 
-        if (this._rotation <= -this._rotationLimit || this._rotation >= this._rotationLimit) {
+        if (this._rotation < -this._rotationLimit)
+        {
+            this._rotation = -this._rotationLimit;
+            this._rotationDirection = -this._rotationDirection;
+        }
+        else if (this._rotation > this._rotationLimit)
+        {
+            this._rotation = this._rotationLimit;
             this._rotationDirection = -this._rotationDirection;
         }
 
