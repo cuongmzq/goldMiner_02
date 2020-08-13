@@ -15,13 +15,13 @@ const C_ITEMS = {
 };
 const LEVEL = {
     LEVEL_01: {
-        ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_02, C_ITEMS.Gold_03],
-        ITEM_COUNT: 7,
+        ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_02, C_ITEMS.Gold_03, C_ITEMS.Rock_01],
+        ITEM_COUNT: 13,
         TARGET: 650
     },
     LEVEL_02: {
         ITEMS: [C_ITEMS.Gold_02, C_ITEMS.Gold_03, C_ITEMS.Diamond],
-        ITEM_COUNT: 12,
+        ITEM_COUNT: 16,
         TARGET: 950
     },
     LEVEL_03: {
@@ -63,7 +63,7 @@ let C_ITEM = cc.Sprite.extend({
                 this.sourceSprite = res.gold_02;
                 this.pickedHookSprite = res.picked_gold_02;
                 this.value = 350;
-                this.weight = 18;
+                this.weight = 17;
                 this.setName("Gold_02");
                 break;
             case C_ITEMS.Gold_03:
@@ -396,6 +396,16 @@ let MainGameLayer = cc.Layer.extend({
         this.createBackground();
         this.createGrid();
         this.createCollectableItems();
+
+        cc.eventManager.addListener({
+            event: cc.EventListener.KEYBOARD,
+            onKeyPressed: (key) => {
+                if (key === cc.KEY.space)
+                {
+                    this.resetLevel();
+                }
+            }
+        }, this);
         this.scheduleUpdate();
     },
 
@@ -553,7 +563,7 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createCollectableItems: function () {
-        let level = LEVEL.LEVEL_03;
+        let level = this.currentLevel;
         let levelKeys = level.ITEMS;
 
         for (let i = 0; i < level.ITEM_COUNT; ++i) {
@@ -575,6 +585,28 @@ let MainGameLayer = cc.Layer.extend({
 
         console.log(collectableItems);
     },
+
+    resetLevel: function () {
+        this.roll.ropeLength = this.roll.ropeLengthMin;
+        this.roll.unschedule("dropping");
+        this.roll.unschedule("scanning");
+        this.roll._rotationDirection = this.roll._previousRotationDirection;
+        this.roll.ropeHook[0].setTexture(res.hook);
+        this.roll._dropSpeed = 5;
+        this.roll.pickedItem = null;
+
+        collectableItems.forEach((item, index) => {
+            this.removeChild(item);
+            collectableItems.splice(index, 1);
+        });
+
+        this.collectableItemsSlots = [];
+    },
+
+    loadNextLevel: function () {
+        this.createGrid();
+        this.createCollectableItems();
+    }
 });
 
 let MainGameScene = cc.Scene.extend({
