@@ -150,6 +150,7 @@ let HOOK_ROLL = cc.Node.extend({
     ropeLength: 0,
     ropeLengthMin: 50,
     ropeLengthMax: 500,
+    ropeLengthMaximum: 0,
 
 
     //rotation conflict with built-in variable
@@ -205,6 +206,9 @@ let HOOK_ROLL = cc.Node.extend({
         this.roll = cc.Sprite.create(res.roll);
         this.roll.setPosition(0, 0);
         this.addChild(this.roll, this.layerZOrder);
+
+        this.ropeLengthMaximum = Math.sqrt(Math.pow(cc.winSize.width / 2, 2) + Math.pow(this.convertToWorldSpace(this.roll.getPosition()).y, 2));
+        this.ropeLengthMax = this.ropeLengthMaximum;
 
         //Second: Hook is the first element
         let hook = cc.Sprite.create(res.hook);
@@ -268,6 +272,9 @@ let HOOK_ROLL = cc.Node.extend({
         this._rotationDirection = 0;
         this._dropDirection = 1;
 
+        // this.ropeLengthMax = ((cc.winSize.width / 2) / Math.abs(Math.cos(cc.degreesToRadians(Math.abs(90 - this._rotation)))));
+        console.log(this.ropeLengthMax);
+
         this.schedule(function (dt) {
             this.dropping();
         }, 0.01, 999, 0, 'dropping');
@@ -303,7 +310,8 @@ let HOOK_ROLL = cc.Node.extend({
     returnedWithPickedItem() {
         mainLayerTHIS.playerMoney += this.pickedItem.value;
         console.log("+ " + this.pickedItem.value + "Money: " + mainLayerTHIS.playerMoney);
-        this.hookRope[0].setTexture(res.hook);
+        this.ropeHook[0].setTexture(res.hook);
+        this.pickedItem = null;
     },
 
     toggleReturnDirection() {
@@ -312,7 +320,7 @@ let HOOK_ROLL = cc.Node.extend({
 
     scanning: function (collectableItemList) {
         collectableItemList.forEach((item, index) => {
-            if (cc.pDistance(mainLayerTHIS.convertToWorldSpace(item.getPosition()), this.convertToWorldSpace(this.ropeHook[0].getPosition())) <= item.getContentSize().width / 2)
+            if (cc.pDistance(mainLayerTHIS.convertToWorldSpace(item.getPosition()), this.convertToWorldSpace(this.ropeHook[0].getPosition())) <= item.getBoundingBox().width / 2)
             {
                 this.toggleReturnDirection();
                 this.pick(item, index);
@@ -360,7 +368,7 @@ let MainGameLayer = cc.Layer.extend({
         this.createRoll();
         this.createBackground();
         this.createGrid();
-        this.createCollectableItems();
+        // this.createCollectableItems();
         this.scheduleUpdate();
     },
 
