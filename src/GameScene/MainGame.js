@@ -20,7 +20,7 @@ const LEVEL = {
         TARGET: 650
     },
     LEVEL_02: {
-        ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_03, C_ITEMS.Diamond, C_ITEMS.Skull, C_ITEMS.Diamond],
+        ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_03, C_ITEMS.Diamond, C_ITEMS.Skull, C_ITEMS.Diamond, C_ITEMS.Bag],
         ITEM_COUNT: 18,
         TARGET: 950
     },
@@ -84,14 +84,14 @@ let C_ITEM = cc.Sprite.extend({
                 break;
             case C_ITEMS.Rock_01:
                 this.sourceSprite = res.rock_01;
-                this.pickedHookSprite = res.rock_01;
+                this.pickedHookSprite = res.picked_rock_01;
                 this.value = 50;
                 this.weight = 19;
                 this.setName("Rock_01");
                 break;
             case C_ITEMS.Diamond:
                 this.sourceSprite = res.diamond;
-                this.pickedHookSprite = res.diamond;
+                this.pickedHookSprite = res.picked_diamond;
                 this.value = 850;
                 this.weight = 14;
                 this.setName("Diamond");
@@ -335,6 +335,11 @@ let HOOK_ROLL = cc.Node.extend({
         this.ropeHook[0].setTexture(res.hook);
         this.pickedItem = null;
         this._dropSpeed = 5;
+        if (mainLayerTHIS.playerMoney >= mainLayerTHIS.currentLevel.TARGET)
+        {
+            mainLayerTHIS.passedLevel = true;
+            console.log("PASSED LEVEL");
+        }
     },
 
     toggleReturnDirection() {
@@ -389,6 +394,7 @@ let MainGameLayer = cc.Layer.extend({
     playerMoneyIncoming: 0,
 
     currentLevel: null,
+    passedLevel: false,
 
 
     ctor: function () {
@@ -402,12 +408,9 @@ let MainGameLayer = cc.Layer.extend({
         cc.eventManager.addListener({
             event: cc.EventListener.KEYBOARD,
             onKeyPressed: (key) => {
-                if (key === cc.KEY.space)
+                if (key === cc.KEY.space && this.passedLevel)
                 {
                     this.resetLevel();
-                }
-                if (key === cc.KEY.c)
-                {
                     this.loadNextLevel();
                 }
             }
@@ -571,6 +574,7 @@ let MainGameLayer = cc.Layer.extend({
     createCollectableItems: function () {
         let level = LEVELS.shift();
         this.currentLevel = level;
+        console.log("TARGET: " + level.TARGET);
         let levelKeys = level.ITEMS;
 
         for (let i = 0; i < level.ITEM_COUNT; ++i) {
@@ -599,6 +603,7 @@ let MainGameLayer = cc.Layer.extend({
         this.roll.ropeHook[0].setTexture(res.hook);
         this.roll._dropSpeed = 5;
         this.roll.pickedItem = null;
+        this.passedLevel = false;
 
         collectableItems.forEach((item, index) => {
             this.removeChild(item);
