@@ -84,7 +84,20 @@ let menuRes = {
     menu_background: "res/Main_Menu/menu_background.png",
     menu_door: "res/Main_Menu/menu_door.png",
     menu_floor: "res/Main_Menu/menu_floor.png",
-    menu_rock: "res/Main_Menu/menu_rock.png"
+    menu_rock: "res/Main_Menu/menu_rock.png",
+    side_left: "res/Main_Menu/side_left.png",
+    side_right: "res/Main_Menu/side_right.png",
+
+    rock_00: "res/Main_Menu/rock_00.png",
+    rock_01: "res/Main_Menu/rock_01.png",
+    rock_02: "res/Main_Menu/rock_02.png",
+
+    gold_miner_text: "res/Main_Menu/gold_miner.png",
+    tom_text: "res/Main_Menu/tom.png",
+
+    shine: "res/Main_Menu/shine.png",
+    miner_head: "res/Main_Menu/miner_head.png",
+    miner_body_gold: "res/Main_Menu/miner_body_gold.png",
 
 }
 

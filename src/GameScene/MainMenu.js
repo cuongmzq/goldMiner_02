@@ -7,15 +7,16 @@ let MainMenuLayer = cc.Layer.extend({
     createEnvironment: function () {
         /// Create Background
         let sprite = cc.Sprite.create(menuRes.menu_background);
-        let countX = Math.ceil(cc.winSize.width / sprite.getBoundingBox().width);
-        let countY = Math.ceil(cc.winSize.height / sprite.getBoundingBox().height);
+        let countX = Math.ceil(cc.winSize.width / sprite.getContentSize().width);
+        let countY = Math.ceil(cc.winSize.height / sprite.getContentSize().height);
 
         for (let i = 0; i < countX; ++i)
         {
             for (let j = 0; j < countY; ++j)
             {
                 let _sprite = cc.Sprite.create(menuRes.menu_background);
-                _sprite.setPosition(cc.p(i * sprite.getBoundingBox().width, j * sprite.getBoundingBox().height));
+                _sprite.setAnchorPoint(0,0);
+                _sprite.setPosition(cc.p(i * sprite.getContentSize().width, j * sprite.getContentSize().height));
                 this.addChild(_sprite,0);
             }
         }
@@ -28,17 +29,87 @@ let MainMenuLayer = cc.Layer.extend({
         {
             let rock = cc.Sprite.create(menuRes.menu_rock);
             rock.setAnchorPoint(0, 0);
-            rock.setPosition(rock.getBoundingBox().width * i, tunnel.getPosition().y - tunnel.getBoundingBox().height / 2);
+            rock.setPosition(rock.getContentSize().width * i, tunnel.getPosition().y - tunnel.getContentSize().height / 2);
             this.addChild(rock, 1);
         }
 
         for (let i = 0; i < 2; ++i)
         {
-            let ground = cc.Sprite.create(menuRes.menu_floor);
+            var ground = cc.Sprite.create(menuRes.menu_floor);
             ground.setAnchorPoint(0, 0);
-            ground.setPosition(ground.getBoundingBox().width * i, 0);
+            ground.setPosition(ground.getContentSize().width * i, 0);
             this.addChild(ground,1);
         }
+
+        let leftSide = cc.Sprite.create(menuRes.side_left);
+        let rightSide = cc.Sprite.create(menuRes.side_right);
+
+        leftSide.setAnchorPoint(0, 1);
+        rightSide.setAnchorPoint(1, 1);
+
+        leftSide.setPosition(0, cc.winSize.height);
+        rightSide.setPosition(cc.winSize.width, cc.winSize.height);
+
+        this.addChild(leftSide, 1);
+        this.addChild(rightSide, 1);
+
+        let rock_00 = cc.Sprite.create(menuRes.rock_00);
+        let rock_01 = cc.Sprite.create(menuRes.rock_01);
+        let rock_02 = cc.Sprite.create(menuRes.rock_02);
+        let rock_03 = cc.Sprite.create(menuRes.rock_00);
+
+
+        rock_00.setPosition(cc.winSize.width / 2 + 250, ground.getContentSize().height / 1.5);
+        rock_01.setPosition(cc.winSize.width / 2 - 190, ground.getContentSize().height / 1.5);
+        rock_02.setPosition(cc.winSize.width / 2 + 190, ground.getContentSize().height / 1.6);
+        rock_03.setPosition(cc.winSize.width / 2 + 490, ground.getContentSize().height / 1.2);
+
+        rock_00.setAnchorPoint(0.5, 0);
+        rock_01.setAnchorPoint(0.5, 0);
+        rock_02.setAnchorPoint(0.5, 0);
+        rock_03.setAnchorPoint(0.5, 0);
+
+
+        this.addChild(rock_00, 1);
+        this.addChild(rock_01, 1);
+        this.addChild(rock_02, 1);
+        this.addChild(rock_03, 1);
+
+        let gold_miner_text = cc.Sprite.create(menuRes.gold_miner_text);
+        gold_miner_text.setAnchorPoint(0.5, 1);
+        gold_miner_text.setPosition(cc.winSize.width / 2, cc.winSize.height - gold_miner_text.getContentSize().height / 2);
+        this.addChild(gold_miner_text);
+
+        let tom_text = cc.Sprite.create(menuRes.tom_text);
+        tom_text.setPosition(cc.p(gold_miner_text.x + gold_miner_text.getContentSize().width / 2 - 20, gold_miner_text.y - gold_miner_text.getContentSize().height / 2 - 20));
+        tom_text.setAnchorPoint(0.5, 1);
+        tom_text.setRotation(-20);
+        this.addChild(tom_text);
+
+        let shining = cc.Sprite.create(menuRes.shine);
+        shining.setPosition(gold_miner_text.getPosition());
+        this.addChild(shining);
+
+        let shake = cc.sequence(cc.scaleTo(0.5, 1.1, 1.1), cc.scaleTo(0.5, 1, 1));
+
+        let spinning = cc.repeatForever(cc.rotateBy(0.05, 5));
+        let shakeShining = cc.sequence(cc.scaleTo(0.5, 1.1, 1.1), cc.scaleTo(0.5, 1, 1));
+
+        // let spawn = new cc.spawn(shining, shakeShining);
+
+        let _shake = cc.sequence(cc.scaleTo(0.5, 1.1, 1.1), cc.scaleTo(0.5, 1, 1));
+        let _spinning = cc.rotateBy(0.01, 5)
+        shining.runAction(cc.repeatForever(cc.spawn(_shake,_spinning)));
+
+        tom_text.runAction(cc.repeatForever(shakeShining));
+
+        // cc.rectIntersectsRect()
+        //Miner
+
+        let miner_body = cc.Sprite.create(menuRes.miner_body_gold);
+        miner_body.setAnchorPoint(0.5, 0);
+        miner_body.setPosition(cc.winSize.width / 2, ground.getContentSize().height / 1.5);
+        this.addChild(miner_body,1);
     }
 });
 

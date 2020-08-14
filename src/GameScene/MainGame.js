@@ -196,7 +196,7 @@ let HOOK_ROLL = cc.Node.extend({
     _rotationDirection: 1,
     _rotationLimit: 85,
 
-    _previousRotationDirection: 0,
+    _previousRotationDirection: 1,
 
     _dropDirection: 0,
 
@@ -248,7 +248,9 @@ let HOOK_ROLL = cc.Node.extend({
         this.roll.setPosition(0, 0);
         this.addChild(this.roll, this.layerZOrder);
 
-        this.ropeLengthMaximum = Math.sqrt(Math.pow(cc.winSize.width / 2, 2) + Math.pow(this.convertToWorldSpace(this.roll.getPosition()).y, 2));
+        // this.ropeLengthMaximum = Math.sqrt(Math.pow(cc.winSize.width / 2, 2) + Math.pow(this.convertToWorldSpace(this.roll.getPosition()).y, 2));
+        // console.log(mainLayerTHIS.convertToNodeSpace(this.roll.getPosition()));
+        this.ropeLengthMaximum = Math.sqrt(Math.pow(cc.winSize.width / 2, 2) + Math.pow(mainLayerTHIS.groundOrigin.y, 2));
         this.ropeLengthMax = this.ropeLengthMaximum;
 
         //Second: Hook is the first element
@@ -257,12 +259,6 @@ let HOOK_ROLL = cc.Node.extend({
         hook.setAnchorPoint(0.5, 0.9);
         this.ropeHook[0] = hook;
         this.addChild(this.ropeHook[0], this.layerZOrder + 1);
-        console.log(hook.y, this.ropeHook[0].y);
-
-        // this.hookCircleDebug = cc.DrawNode.create();
-        // this.hookCircleDebug.clear();
-        // this.hookCircleDebug.drawCircle(this.ropeHook[0].getPosition(), this.ropeHook[0].getContentSize().width / 2, cc.degreesToRadians(360), 30, true, 5, cc.color(150, 255, 0));
-        // this.addChild(this.hookCircleDebug);
 
         //Third: 5 is the height of ropeTile Res
         this.ropePartsCount = this.ropeLengthMax / 5;
@@ -428,8 +424,8 @@ let MainGameLayer = cc.Layer.extend({
 
     currentLevel: null,
     passedLevel: false,
-    timer: 15,
-    timeLevel: 15,
+    timer: 1,
+    timeLevel: 30,
 
     timerUIText: null,
     currentMoneyUIText: null,
@@ -443,12 +439,17 @@ let MainGameLayer = cc.Layer.extend({
         this.createUI();
         this.createBackground();
         this.createRoll();
+        this.resetLevel();
         this.loadNextLevel();
 
         this.scheduleUpdate();
     },
 
     update: function (dt) {
+        this.countDown(dt);
+    },
+
+    countDown: function (dt) {
         if (this.timer > 0)
         {
             this.timer -= dt;
@@ -460,15 +461,6 @@ let MainGameLayer = cc.Layer.extend({
             this.loadNextLevel();
         }
 
-        this.timerUIText.setString(parseInt(this.timer));
-    },
-
-    countDown: function (dt) {
-        if (this.timer > 0)
-        {
-            this.timer -= dt;
-        }
-        // this.timerUIText.setString("Timer " + parseInt(this.timer));
         this.timerUIText.setString(parseInt(this.timer));
     },
 
