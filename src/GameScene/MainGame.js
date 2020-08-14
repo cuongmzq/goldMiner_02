@@ -178,7 +178,6 @@ let C_ITEM = cc.Sprite.extend({
 });
 
 let HOOK_ROLL = cc.Node.extend({
-    miner: null,
     roll: null,
     ropeHook: [],
 
@@ -235,13 +234,10 @@ let HOOK_ROLL = cc.Node.extend({
 
     update: function (dt) {
         this.swinging(dt);
-        // this.hookCircleDebug.clear();
-        // this.hookCircleDebug.drawCircle(this.ropeHook[0].getPosition(), this.ropeHook[0].getContentSize().width / 2, cc.degreesToRadians(360), 30, true, 5, cc.color(150, 255, 0));
-
     },
 
     initMiner: function () {
-        this.miner.head = cc.create(res.)
+
     },
 
     initRollHookRope: function () {
@@ -393,7 +389,7 @@ let HOOK_ROLL = cc.Node.extend({
 
     scanning: function (collectableItemList) {
         collectableItemList.forEach((item, index) => {
-            if (cc.pDistance(mainLayerTHIS.convertToWorldSpace(item.getPosition()), this.convertToWorldSpace(this.ropeHook[0].getPosition())) <= item.getBoundingBox().width / 2)
+            if (cc.pDistance(mainLayerTHIS.convertToWorldSpace(item.getPosition()), this.convertToWorldSpace(this.ropeHook[0].getPosition())) <= item.getContentSize().width / 2)
             {
                 this.pick(item, index);
                 this.toggleReturnDirection();
@@ -416,6 +412,8 @@ let HOOK_ROLL = cc.Node.extend({
 
 let MainGameLayer = cc.Layer.extend({
     roll: null,
+
+    groundOrigin: 0,
 
     gridWidth: 0,
     gridHeight: 0,
@@ -443,8 +441,8 @@ let MainGameLayer = cc.Layer.extend({
         this._super();
         mainLayerTHIS = this;
         this.createUI();
-        this.createRoll();
         this.createBackground();
+        this.createRoll();
         this.loadNextLevel();
 
         this.scheduleUpdate();
@@ -560,6 +558,7 @@ let MainGameLayer = cc.Layer.extend({
         let ground_tile_01 = cc.Sprite.create(res.ground_tile);
         ground_tile_01.setAnchorPoint(0, 0.5);
         ground_tile_01.setPosition(0, game_top_bg_01.y - game_top_bg_01.getContentSize().height);
+        this.groundOrigin = cc.p(cc.winSize.width / 2, ground_tile_01.getPosition().y);
         this.addChild(ground_tile_01);
 
         let ground_tileCount = cc.winSize.width / ground_tile_01.getContentSize().width;
@@ -569,7 +568,6 @@ let MainGameLayer = cc.Layer.extend({
             ground_tile.setPosition(ground_tile_01.getContentSize().width * i, game_top_bg_01.y - game_top_bg_01.getContentSize().height);
             this.addChild(ground_tile);
         }
-
 
         //Create BG_Layer_01 Tile
         let bg_tile_01_01 = cc.Sprite.create(res.bg_tile_01);
@@ -662,7 +660,7 @@ let MainGameLayer = cc.Layer.extend({
 
     createRoll: function () {
         this.roll = new HOOK_ROLL();
-        this.roll.setPosition(cc.winSize.width / 2, cc.winSize.height / 2 + 200);
+        this.roll.setPosition(cc.winSize.width / 2, this.groundOrigin.y + this.roll.roll.getContentSize().height / 2);
         this.addChild(this.roll, 6);
     },
 
@@ -714,10 +712,13 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     loadNextLevel: function () {
-        this.currentLevel = LEVELS.shift();
+        if (LEVELS.length > 0)
+        {
+            this.currentLevel = LEVELS.shift();
 
-        this.createGrid();
-        this.createCollectableItems();
+            this.createGrid();
+            this.createCollectableItems();
+        }
     }
 });
 

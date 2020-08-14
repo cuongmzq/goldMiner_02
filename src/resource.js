@@ -23,13 +23,19 @@
  ****************************************************************************/
 
 let res = {
-
+    miner_head_00: "res/Miner_and_His_Items/Miner/miner_head_00.png",
+    miner_head_01: "res/Miner_and_His_Items/Miner/miner_head_01.png",
+    miner_body: "res/Miner_and_His_Items/Miner/miner_body.png",
+    miner_arm: "res/Miner_and_His_Items/Miner/miner_arm.png",
+    miner_arm_up: "res/Miner_and_His_Items/Miner/miner_arm_up.png",
+    miner_hand: "res/Miner_and_His_Items/Miner/miner_hand.png",
+    miner_shadow: "res/Miner_and_His_Items/Miner/miner_shadow.png",
 
     rope_tile: "res/Miner_and_His_Items/rope_tile.png",
     rope_hide: "res/Miner_and_His_Items/rope_hide.png",
     roll: "res/Miner_and_His_Items/roll.png",
     hook: "res/Miner_and_His_Items/hook.png",
-
+    //
     bg_tile_01: "res/Background/bg_tile_01.png",
     bg_tile_02: "res/Background/bg_tile_02.png",
     bg_tile_03: "res/Background/bg_tile_03.png",
@@ -74,7 +80,20 @@ let res = {
     picked_mole_diamond: "res/Picked_Item/picked_mole_diamond.png"
 }
 
+let menuRes = {
+    menu_background: "res/Main_Menu/menu_background.png",
+    menu_door: "res/Main_Menu/menu_door.png",
+    menu_floor: "res/Main_Menu/menu_floor.png",
+    menu_rock: "res/Main_Menu/menu_rock.png"
+
+}
+
 let g_resources = [];
+
 for (let i in res) {
     g_resources.push(res[i]);
+}
+
+for (let i in menuRes) {
+    g_resources.push(menuRes[i]);
 }
