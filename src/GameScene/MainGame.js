@@ -13,13 +13,8 @@ const C_ITEMS = {
     Mole: 12,
     Mole_diamond: 13
 };
-const LEVEL = {
 
-    LEVEL_00: {
-        ITEMS: [C_ITEMS.Diamond],
-        ITEM_COUNT: 99,
-        TARGET: 650
-    },
+const LEVEL = {
     LEVEL_01: {
         ITEMS: [C_ITEMS.Gold_00, C_ITEMS.Gold_02, C_ITEMS.Gold_03, C_ITEMS.Rock_01],
         ITEM_COUNT: 15,
@@ -46,10 +41,14 @@ const LEVEL = {
         ITEM_COUNT: 40,
         TARGET: 6900
     },
-
+    LEVEL_06: {
+        ITEMS: [C_ITEMS.Diamond],
+        ITEM_COUNT: 99,
+        TARGET: 19650
+    },
 };
 
-let LEVELS = [LEVEL.LEVEL_05];
+let LEVELS = [LEVEL.LEVEL_01, LEVEL.LEVEL_02, LEVEL.LEVEL_03, LEVEL.LEVEL_04, LEVEL.LEVEL_05];
 
 let collectableItems = [];
 let mainLayerTHIS = null;
@@ -179,17 +178,18 @@ let C_ITEM = cc.Sprite.extend({
 });
 
 let HOOK_ROLL = cc.Node.extend({
-    layerZOrder: 5,
+    miner: null,
     roll: null,
     ropeHook: [],
+
     hookCircleDebug: null,
+    layerZOrder: 5,
 
     ropePartsCount: 0,
     ropeLength: 0,
     ropeLengthMin: 50,
     ropeLengthMax: 500,
     ropeLengthMaximum: 0,
-
 
     //rotation conflict with built-in variable
     _rotation: 0,
@@ -235,9 +235,13 @@ let HOOK_ROLL = cc.Node.extend({
 
     update: function (dt) {
         this.swinging(dt);
-        this.hookCircleDebug.clear();
-        this.hookCircleDebug.drawCircle(this.ropeHook[0].getPosition(), this.ropeHook[0].getContentSize().width / 2, cc.degreesToRadians(360), 30, true, 5, cc.color(150, 255, 0));
+        // this.hookCircleDebug.clear();
+        // this.hookCircleDebug.drawCircle(this.ropeHook[0].getPosition(), this.ropeHook[0].getContentSize().width / 2, cc.degreesToRadians(360), 30, true, 5, cc.color(150, 255, 0));
 
+    },
+
+    initMiner: function () {
+        this.miner.head = cc.create(res.)
     },
 
     initRollHookRope: function () {
@@ -259,10 +263,10 @@ let HOOK_ROLL = cc.Node.extend({
         this.addChild(this.ropeHook[0], this.layerZOrder + 1);
         console.log(hook.y, this.ropeHook[0].y);
 
-        this.hookCircleDebug = cc.DrawNode.create();
-        this.hookCircleDebug.clear();
-        this.hookCircleDebug.drawCircle(this.ropeHook[0].getPosition(), this.ropeHook[0].getContentSize().width / 2, cc.degreesToRadians(360), 30, true, 5, cc.color(150, 255, 0));
-        this.addChild(this.hookCircleDebug);
+        // this.hookCircleDebug = cc.DrawNode.create();
+        // this.hookCircleDebug.clear();
+        // this.hookCircleDebug.drawCircle(this.ropeHook[0].getPosition(), this.ropeHook[0].getContentSize().width / 2, cc.degreesToRadians(360), 30, true, 5, cc.color(150, 255, 0));
+        // this.addChild(this.hookCircleDebug);
 
         //Third: 5 is the height of ropeTile Res
         this.ropePartsCount = this.ropeLengthMax / 5;
@@ -358,6 +362,9 @@ let HOOK_ROLL = cc.Node.extend({
 
     returnedWithPickedItem() {
         mainLayerTHIS.playerMoney += this.pickedItem.value;
+        mainLayerTHIS.plusMoney.setString("+" + this.pickedItem.value);
+        mainLayerTHIS.animatePlusMoney();
+
         console.log("+ " + this.pickedItem.value + " " + "Money: " + mainLayerTHIS.playerMoney);
         this.ropeHook[0].setTexture(res.hook);
         this.pickedItem = null;
@@ -392,11 +399,6 @@ let HOOK_ROLL = cc.Node.extend({
                 this.toggleReturnDirection();
             }
         });
-
-
-        // let node = cc.DrawNode();
-        // node.drawCircle(p, 5);
-        // node.clear();
     },
 
     pick: function(item, itemIndex) {
@@ -407,6 +409,7 @@ let HOOK_ROLL = cc.Node.extend({
 
         console.log("Picked " + item.getName() + " Value: " + item.value + " Weight: " + item.weight);
         mainLayerTHIS.removeChild(item);
+        this.unschedule("scanning");
     },
 });
 
@@ -427,11 +430,14 @@ let MainGameLayer = cc.Layer.extend({
 
     currentLevel: null,
     passedLevel: false,
-    timer: 40,
+    timer: 15,
+    timeLevel: 15,
 
     timerUIText: null,
     currentMoneyUIText: null,
     targetMoneyUIText: null,
+
+    plusMoneyUIText: null,
 
     ctor: function () {
         this._super();
@@ -439,18 +445,56 @@ let MainGameLayer = cc.Layer.extend({
         this.createUI();
         this.createRoll();
         this.createBackground();
-        this.createGrid();
-        this.createCollectableItems();
+        this.loadNextLevel();
 
         this.scheduleUpdate();
     },
 
     update: function (dt) {
-        this.timer -= dt;
-        // this.timerUIText.setString("Timer " + parseInt(this.timer));
-        this.timerUIText.setString("");
+        if (this.timer > 0)
+        {
+            this.timer -= dt;
+        }
+        else
+        {
+            // this.loadLevelTransition();
+            this.resetLevel();
+            this.loadNextLevel();
+        }
 
+        this.timerUIText.setString(parseInt(this.timer));
     },
+
+    countDown: function (dt) {
+        if (this.timer > 0)
+        {
+            this.timer -= dt;
+        }
+        // this.timerUIText.setString("Timer " + parseInt(this.timer));
+        this.timerUIText.setString(parseInt(this.timer));
+    },
+
+    animatePlusMoney: function () {
+        this.plusMoney.setVisible(true);
+
+        let moveBy = cc.moveBy(0.4, cc.p(-300, 100), 0);
+
+        let fade = new cc.fadeOut(0.2);
+        let fadeIn = new cc.fadeIn(0.1);
+        let changePos = new cc.moveTo(0, cc.p(this.roll.getPosition().x, this.roll.getPosition().y + 10), 0);
+        let delay = new cc.delayTime(0.8);
+
+        let sequence = new cc.sequence(changePos, fadeIn, moveBy, delay, fade);
+        this.plusMoney.runAction(sequence);
+    },
+
+    // loadLevelTransition: function () {
+    //     let fadeIn = new cc.fadeIn(0.2);
+    //     let fadeOut = new cc.fadeOut(0.2);
+    //     let sequence = new cc.sequence(fadeOut, fadeIn);
+    //
+    //     this.runAction(sequence);
+    // },
 
     createUI: function () {
        this.timerUIText = new cc.LabelTTF("Timer: ", "Arial", 32 , cc.size(180, 60), cc.TEXT_ALIGNMENT_LEFT, cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
@@ -458,7 +502,7 @@ let MainGameLayer = cc.Layer.extend({
        this.timerUIText.setPosition(cc.winSize.width, cc.winSize.height);
        this.addChild(this.timerUIText, 10);
 
-        this.currentMoneyUIText = new cc.LabelTTF("Money: ", "Arial", 32 , cc.size(400, 60), cc.TEXT_ALIGNMENT_LEFT, cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.currentMoneyUIText = new cc.LabelTTF("Money: " + 0, "Arial", 32 , cc.size(400, 60), cc.TEXT_ALIGNMENT_LEFT, cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
         this.currentMoneyUIText.setAnchorPoint(0, 1);
         this.currentMoneyUIText.setPosition(10, cc.winSize.height);
         this.addChild(this.currentMoneyUIText, 10);
@@ -467,6 +511,10 @@ let MainGameLayer = cc.Layer.extend({
         this.targetMoneyUIText.setAnchorPoint(0, 1);
         this.targetMoneyUIText.setPosition(10, cc.winSize.height - 100);
         this.addChild(this.targetMoneyUIText, 10);
+
+        this.plusMoney = new cc.LabelTTF("+", "Arial", 20, cc.size(50,50), cc.TEXT_ALIGNMENT_CENTER, cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.addChild(this.plusMoney, 10);
+        this.plusMoney.setVisible(false);
     },
 
     // Init creation
@@ -581,8 +629,8 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createGrid: function () {
-        this.countX = 15;
-        this.countY = 10;
+        this.countX = 16;
+        this.countY = 9;
 
         this.gridWidth = 1000;
         this.gridHeight = this.roll.y - 100;
@@ -619,30 +667,25 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     createCollectableItems: function () {
-        let level = LEVELS.shift();
-        this.currentLevel = level;
-        console.log("TARGET: " + level.TARGET);
-        this.targetMoneyUIText.setString("Target: " + level.TARGET);
-        let levelKeys = level.ITEMS;
+        console.log("TARGET: " + this.currentLevel.TARGET);
+        this.targetMoneyUIText.setString("Target: " + this.currentLevel.TARGET);
+        let levelKeys = this.currentLevel.ITEMS;
 
-        for (let i = 0; i < level.ITEM_COUNT; ++i) {
+        for (let i = 0; i < this.currentLevel.ITEM_COUNT; ++i) {
 
             let randomPosID = Math.floor(Math.random() * this.collectableItemsSlots.length);
             let randomID = Math.floor(Math.random() * (levelKeys.length));
 
             let item = levelKeys[randomID];
 
-
-
-
             let collectableItem = new C_ITEM(item);
             collectableItem.setPosition(this.collectableItemsSlots[randomPosID]);
 
-            let drawer = cc.DrawNode.create();
-            drawer.clear();
-            drawer.drawCircle(collectableItem.getPosition(), collectableItem.getContentSize().width / 2, cc.degreesToRadians(360), 30, false, 2, cc.color(255, 0, 9));
-            // drawer.setPosition(collectableItem.getPosition());
-            this.addChild(drawer);
+            // // let drawer = cc.DrawNode.create();
+            // // drawer.clear();
+            // // drawer.drawCircle(collectableItem.getPosition(), collectableItem.getContentSize().width / 2, cc.degreesToRadians(360), 30, false, 2, cc.color(255, 0, 9));
+            // // // drawer.setPosition(collectableItem.getPosition());
+            // this.addChild(drawer);
 
             this.collectableItemsSlots.splice(randomPosID, 1);
 
@@ -661,7 +704,7 @@ let MainGameLayer = cc.Layer.extend({
         this.roll._dropSpeed = 5;
         this.roll.pickedItem = null;
         this.passedLevel = false;
-        this.timer = 40;
+        this.timer = this.timeLevel;
 
         collectableItems.forEach((item, index) => {
             this.removeChild(item);
@@ -671,6 +714,8 @@ let MainGameLayer = cc.Layer.extend({
     },
 
     loadNextLevel: function () {
+        this.currentLevel = LEVELS.shift();
+
         this.createGrid();
         this.createCollectableItems();
     }

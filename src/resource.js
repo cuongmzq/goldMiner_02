@@ -23,6 +23,8 @@
  ****************************************************************************/
 
 let res = {
+
+
     rope_tile: "res/Miner_and_His_Items/rope_tile.png",
     rope_hide: "res/Miner_and_His_Items/rope_hide.png",
     roll: "res/Miner_and_His_Items/roll.png",
