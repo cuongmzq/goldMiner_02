@@ -86,24 +86,31 @@ let MainMenuLayer = cc.Layer.extend({
         tom_text.setRotation(-20);
         this.addChild(tom_text);
 
-        let shining = cc.Sprite.create(menuRes.shine);
-        shining.setPosition(gold_miner_text.getPosition());
-        this.addChild(shining);
 
-        let shake = cc.sequence(cc.scaleTo(0.5, 1.1, 1.1), cc.scaleTo(0.5, 1, 1));
+        let shine = cc.Sprite.extend({
+           ctor: function() {
+               this._super();
+               this.setTexture(menuRes.shine);
 
-        let spinning = cc.repeatForever(cc.rotateBy(0.05, 5));
+               let _rotation = cc.rotateBy(0.3, 20);
+               let _scale = cc.scaleBy(0.5, 1.2);
+
+               this.runAction(cc.repeatForever(_rotation));
+               this.runAction(cc.repeatForever(cc.sequence(_scale, _scale.reverse())));
+
+           }
+        });
+
+        for (let i = 0; i < 4; ++i) {
+            let shining = new shine();
+            shining.setScale(0.3 + 0.2 * (i % 2));
+            shining.setPosition(20 + 200 * i, (gold_miner_text.getContentSize().height - 20) * ((i + 1) % 2) + 10);
+            gold_miner_text.addChild(shining, 10);
+        }
+
         let shakeShining = cc.sequence(cc.scaleTo(0.5, 1.1, 1.1), cc.scaleTo(0.5, 1, 1));
-
-        // let spawn = new cc.spawn(shining, shakeShining);
-
-        let _shake = cc.sequence(cc.scaleTo(0.5, 1.1, 1.1), cc.scaleTo(0.5, 1, 1));
-        let _spinning = cc.rotateBy(0.01, 5)
-        shining.runAction(cc.repeatForever(cc.spawn(_shake,_spinning)));
-
         tom_text.runAction(cc.repeatForever(shakeShining));
-
-        // cc.rectIntersectsRect()
+        
         //Miner
 
         let miner_body = cc.Sprite.create(menuRes.miner_body_gold);
