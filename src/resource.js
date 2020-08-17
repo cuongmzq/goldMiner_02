@@ -22,7 +22,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-let res = {
+let resources = {
     miner_head_00: "res/Miner_and_His_Items/Miner/miner_head_00.png",
     miner_head_01: "res/Miner_and_His_Items/Miner/miner_head_01.png",
     miner_body: "res/Miner_and_His_Items/Miner/miner_body.png",
@@ -103,8 +103,8 @@ let menuRes = {
 
 let g_resources = [];
 
-for (let i in res) {
-    g_resources.push(res[i]);
+for (let i in resources) {
+    g_resources.push(resources[i]);
 }
 
 for (let i in menuRes) {

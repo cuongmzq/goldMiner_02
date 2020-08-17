@@ -65,92 +65,92 @@ let C_ITEM = cc.Sprite.extend({
         switch (itemEnum)
         {
             case C_ITEMS.Gold_00:
-                this.sourceSprite = res.gold_00;
-                this.pickedHookSprite = res.picked_gold_00;
+                this.sourceSprite = resources.gold_00;
+                this.pickedHookSprite = resources.picked_gold_00;
                 this.value = 60;
                 this.weight = 13;
                 this.setName("Gold_00");
                 break;
             case C_ITEMS.Gold_01:
-                this.sourceSprite = res.gold_01;
-                this.pickedHookSprite = res.picked_gold_01;
+                this.sourceSprite = resources.gold_01;
+                this.pickedHookSprite = resources.picked_gold_01;
                 this.value = 150;
                 this.weight = 15;
                 this.setName("Gold_01");
                 break;
             case C_ITEMS.Gold_02:
-                this.sourceSprite = res.gold_02;
-                this.pickedHookSprite = res.picked_gold_02;
+                this.sourceSprite = resources.gold_02;
+                this.pickedHookSprite = resources.picked_gold_02;
                 this.value = 350;
                 this.weight = 17;
                 this.setName("Gold_02");
                 break;
             case C_ITEMS.Gold_03:
-                this.sourceSprite = res.gold_03;
-                this.pickedHookSprite = res.picked_gold_03;
+                this.sourceSprite = resources.gold_03;
+                this.pickedHookSprite = resources.picked_gold_03;
                 this.value = 500;
                 this.weight = 19;
                 this.setName("Gold_03");
                 break;
             case C_ITEMS.Rock_00:
-                this.sourceSprite = res.rock_00;
-                this.pickedHookSprite = res.picked_rock_00;
+                this.sourceSprite = resources.rock_00;
+                this.pickedHookSprite = resources.picked_rock_00;
                 this.value = 20;
                 this.weight = 17;
                 this.setName("Rock_00");
                 break;
             case C_ITEMS.Rock_01:
-                this.sourceSprite = res.rock_01;
-                this.pickedHookSprite = res.picked_rock_01;
+                this.sourceSprite = resources.rock_01;
+                this.pickedHookSprite = resources.picked_rock_01;
                 this.value = 50;
                 this.weight = 19;
                 this.setName("Rock_01");
                 break;
             case C_ITEMS.Diamond:
-                this.sourceSprite = res.diamond;
-                this.pickedHookSprite = res.picked_diamond;
+                this.sourceSprite = resources.diamond;
+                this.pickedHookSprite = resources.picked_diamond;
                 this.value = 850;
                 this.weight = 14;
                 this.setName("Diamond");
                 break;
             case C_ITEMS.Bag:
-                this.sourceSprite = res.bag;
-                this.pickedHookSprite = res.picked_bag;
+                this.sourceSprite = resources.bag;
+                this.pickedHookSprite = resources.picked_bag;
                 this.value = Math.floor(Math.random() * 900) ;
                 this.weight = 14;
                 this.setName("Bag");
                 break;
             case C_ITEMS.Bone:
-                this.sourceSprite = res.bone;
-                this.pickedHookSprite = res.picked_bone;
+                this.sourceSprite = resources.bone;
+                this.pickedHookSprite = resources.picked_bone;
                 this.value = 1;
                 this.weight = 12;
                 this.setName("Bone");
                 break;
             case C_ITEMS.Skull:
-                this.sourceSprite = res.skull;
-                this.pickedHookSprite = res.picked_skull;
+                this.sourceSprite = resources.skull;
+                this.pickedHookSprite = resources.picked_skull;
                 this.value = 15;
                 this.weight = 10;
                 this.setName("Skull");
                 break;
             case C_ITEMS.TNT:
-                this.sourceSprite = res.tnt;
-                this.pickedHookSprite = res.picked_fracture;
+                this.sourceSprite = resources.tnt;
+                this.pickedHookSprite = resources.picked_fracture;
                 this.value = 2;
                 this.weight = 15;
                 this.setName("TNT");
                 break;
             case C_ITEMS.Mole:
-                this.sourceSprite = res.mole_00;
-                this.pickedHookSprite = res.picked_mole;
+                this.sourceSprite = resources.mole_00;
+                this.pickedHookSprite = resources.picked_mole;
                 this.value = 5;
                 this.weight = 12;
                 this.setName("Mole");
                 break;
             case C_ITEMS.Mole_diamond:
-                this.sourceSprite = res.mole_diamond_00;
-                this.pickedHookSprite = res.picked_mole_diamond;
+                this.sourceSprite = resources.mole_diamond_00;
+                this.pickedHookSprite = resources.picked_mole_diamond;
                 this.value = 855;
                 this.weight = 14;
                 this.setName("Mole_diamond");
@@ -244,7 +244,7 @@ let HOOK_ROLL = cc.Node.extend({
         this.ropeLength = this.ropeLengthMin;
 
         //First
-        this.roll = cc.Sprite.create(res.roll);
+        this.roll = cc.Sprite.create(resources.roll);
         this.roll.setPosition(0, 0);
         this.addChild(this.roll, this.layerZOrder);
 
@@ -254,7 +254,7 @@ let HOOK_ROLL = cc.Node.extend({
         this.ropeLengthMax = this.ropeLengthMaximum;
 
         //Second: Hook is the first element
-        let hook = cc.Sprite.create(res.hook);
+        let hook = cc.Sprite.create(resources.hook);
         hook.setPosition(cc.p(this.roll.x, this.roll.y - 5 * this.ropeLengthMin));
         hook.setAnchorPoint(0.5, 0.9);
         this.ropeHook[0] = hook;
@@ -264,7 +264,7 @@ let HOOK_ROLL = cc.Node.extend({
         this.ropePartsCount = this.ropeLengthMax / 5;
 
         for (let i = 1; i <= this.ropePartsCount; ++i) {
-            let ropePart = cc.Sprite.create(res.rope_tile);
+            let ropePart = cc.Sprite.create(resources.rope_tile);
             let position = cc.p(this.roll.x, this.roll.y - 5 * i);
 
             ropePart.setAnchorPoint(0.5, 1);
@@ -280,7 +280,7 @@ let HOOK_ROLL = cc.Node.extend({
             this.addChild(this.ropeHook[i], this.layerZOrder);
         }
 
-        let ropeHide = cc.Sprite.create(res.rope_hide);
+        let ropeHide = cc.Sprite.create(resources.rope_hide);
         ropeHide.setPosition(cc.p(this.roll.x - 2, this.roll.y + 2));
         this.addChild(ropeHide, this.layerZOrder);
     },
@@ -358,7 +358,7 @@ let HOOK_ROLL = cc.Node.extend({
         mainLayerTHIS.animatePlusMoney();
 
         console.log("+ " + this.pickedItem.value + " " + "Money: " + mainLayerTHIS.playerMoney);
-        this.ropeHook[0].setTexture(res.hook);
+        this.ropeHook[0].setTexture(resources.hook);
         this.pickedItem = null;
         this._dropSpeed = 5;
 
@@ -510,14 +510,14 @@ let MainGameLayer = cc.Layer.extend({
     // Init creation
     createBackground: function () {
         //Create Brown Under Layer
-        let brown_tile = cc.Sprite.create(res.white_tile);
+        let brown_tile = cc.Sprite.create(resources.white_tile);
         brown_tile.runAction(cc.tintTo(0, 86, 52, 37));
         brown_tile.setAnchorPoint(0, 0);
         brown_tile.setScale(cc.winSize.width / brown_tile.width, cc.winSize.height / brown_tile.height);
         this.addChild(brown_tile, 0);
 
         //Create Purple Tile
-        let purple_tile_01 = cc.Sprite.create(res.purple_tile);
+        let purple_tile_01 = cc.Sprite.create(resources.purple_tile);
         purple_tile_01.setAnchorPoint(0, 1);
         purple_tile_01.setScale(1, 1.5);
         purple_tile_01.setPosition(0, cc.winSize.height);
@@ -525,7 +525,7 @@ let MainGameLayer = cc.Layer.extend({
 
         let purple_tileCount = cc.winSize.width / purple_tile_01.getContentSize().width;
         for (let i = 1; i <= purple_tileCount; ++i) {
-            let purple_tile = cc.Sprite.create(res.purple_tile);
+            let purple_tile = cc.Sprite.create(resources.purple_tile);
             purple_tile.setAnchorPoint(0, 1);
             purple_tile.setScale(1, 1.5);
             purple_tile.setPosition(purple_tile_01.getContentSize().width * i, cc.winSize.height);
@@ -533,21 +533,21 @@ let MainGameLayer = cc.Layer.extend({
         }
 
         //Create Purple Tile
-        let game_top_bg_01 = cc.Sprite.create(res.game_top_bg);
+        let game_top_bg_01 = cc.Sprite.create(resources.game_top_bg);
         game_top_bg_01.setAnchorPoint(0, 1);
         game_top_bg_01.setPosition(0, cc.winSize.height);
         this.addChild(game_top_bg_01);
 
         let game_top_bgCount = cc.winSize.width / game_top_bg_01.getContentSize().width;
         for (let i = 1; i <= game_top_bgCount; ++i) {
-            let game_top_bg = cc.Sprite.create(res.game_top_bg);
+            let game_top_bg = cc.Sprite.create(resources.game_top_bg);
             game_top_bg.setAnchorPoint(0, 1);
             game_top_bg.setPosition(game_top_bg_01.getContentSize().width * i, cc.winSize.height);
             this.addChild(game_top_bg);
         }
 
         //Create Ground Tile
-        let ground_tile_01 = cc.Sprite.create(res.ground_tile);
+        let ground_tile_01 = cc.Sprite.create(resources.ground_tile);
         ground_tile_01.setAnchorPoint(0, 0.5);
         ground_tile_01.setPosition(0, game_top_bg_01.y - game_top_bg_01.getContentSize().height);
         this.groundOrigin = cc.p(cc.winSize.width / 2, ground_tile_01.getPosition().y);
@@ -555,63 +555,63 @@ let MainGameLayer = cc.Layer.extend({
 
         let ground_tileCount = cc.winSize.width / ground_tile_01.getContentSize().width;
         for (let i = 1; i <= ground_tileCount; ++i) {
-            let ground_tile = cc.Sprite.create(res.ground_tile);
+            let ground_tile = cc.Sprite.create(resources.ground_tile);
             ground_tile.setAnchorPoint(0, 0.5);
             ground_tile.setPosition(ground_tile_01.getContentSize().width * i, game_top_bg_01.y - game_top_bg_01.getContentSize().height);
             this.addChild(ground_tile);
         }
 
         //Create BG_Layer_01 Tile
-        let bg_tile_01_01 = cc.Sprite.create(res.bg_tile_01);
+        let bg_tile_01_01 = cc.Sprite.create(resources.bg_tile_01);
         bg_tile_01_01.setAnchorPoint(0, 0.5);
         bg_tile_01_01.setPosition(0, ground_tile_01.y / 2);
         this.addChild(bg_tile_01_01);
 
         let bg_tile_01Count = cc.winSize.width / bg_tile_01_01.getContentSize().width;
         for (let i = 1; i <= bg_tile_01Count; ++i) {
-            let bg_tile_01 = cc.Sprite.create(res.bg_tile_01);
+            let bg_tile_01 = cc.Sprite.create(resources.bg_tile_01);
             bg_tile_01.setAnchorPoint(0, 0.5);
             bg_tile_01.setPosition(bg_tile_01_01.getContentSize().width * i, ground_tile_01.y / 2);
             this.addChild(bg_tile_01);
         }
 
         //Create BG_Layer_02 Tile
-        let bg_tile_02_01 = cc.Sprite.create(res.bg_tile_02);
+        let bg_tile_02_01 = cc.Sprite.create(resources.bg_tile_02);
         bg_tile_02_01.setAnchorPoint(0, 0.5);
         bg_tile_02_01.setPosition(0, ground_tile_01.y / 4 * 3);
         this.addChild(bg_tile_02_01);
 
         let bg_tile_02Count = cc.winSize.width / bg_tile_02_01.getContentSize().width;
         for (let i = 1; i <= bg_tile_02Count; ++i) {
-            let bg_tile_02 = cc.Sprite.create(res.bg_tile_02);
+            let bg_tile_02 = cc.Sprite.create(resources.bg_tile_02);
             bg_tile_02.setAnchorPoint(0, 0.5);
             bg_tile_02.setPosition(bg_tile_02_01.getContentSize().width * i, ground_tile_01.y / 4 * 3);
             this.addChild(bg_tile_02);
         }
 
         //Create BG_Layer_03Tile
-        let bg_tile_03_01 = cc.Sprite.create(res.bg_tile_03);
+        let bg_tile_03_01 = cc.Sprite.create(resources.bg_tile_03);
         bg_tile_03_01.setAnchorPoint(0, 0.5);
         bg_tile_03_01.setPosition(0, ground_tile_01.y / 4);
         this.addChild(bg_tile_03_01);
 
         let bg_tile_03Count = cc.winSize.width / bg_tile_03_01.getContentSize().width;
         for (let i = 1; i <= bg_tile_03Count; ++i) {
-            let bg_tile_03 = cc.Sprite.create(res.bg_tile_03);
+            let bg_tile_03 = cc.Sprite.create(resources.bg_tile_03);
             bg_tile_03.setAnchorPoint(0, 0.5);
             bg_tile_03.setPosition(bg_tile_03_01.getContentSize().width * i, ground_tile_01.y / 4);
             this.addChild(bg_tile_03);
         }
 
         //Create BG_Layer_04 Tile
-        let bg_tile_04_01 = cc.Sprite.create(res.bg_tile_04);
+        let bg_tile_04_01 = cc.Sprite.create(resources.bg_tile_04);
         bg_tile_04_01.setAnchorPoint(0, 0.75);
         bg_tile_04_01.setPosition(0, 0);
         this.addChild(bg_tile_04_01);
 
         let bg_tile_04Count = cc.winSize.width / bg_tile_04_01.getContentSize().width;
         for (let i = 1; i <= bg_tile_04Count; ++i) {
-            let bg_tile_04 = cc.Sprite.create(res.bg_tile_04);
+            let bg_tile_04 = cc.Sprite.create(resources.bg_tile_04);
             bg_tile_04.setAnchorPoint(0, 0.75);
             bg_tile_04.setPosition(bg_tile_04_01.getContentSize().width * i, 0);
             this.addChild(bg_tile_04);
@@ -641,7 +641,7 @@ let MainGameLayer = cc.Layer.extend({
                 let position = cc.p(firstPoint.x + tileWidth * column, firstPoint.y + tileHeight * row);
 
                 //For Testing Overlay
-                // let tile = cc.Sprite.create(res.white_tile);
+                // let tile = cc.Sprite.create(resources.white_tile);
                 // tile.setPosition(position);
                 // this.addChild(tile, 10);
 
@@ -690,7 +690,7 @@ let MainGameLayer = cc.Layer.extend({
         this.roll.unschedule("dropping");
         this.roll.unschedule("scanning");
         this.roll._rotationDirection = this.roll._previousRotationDirection;
-        this.roll.ropeHook[0].setTexture(res.hook);
+        this.roll.ropeHook[0].setTexture(resources.hook);
         this.roll._dropSpeed = 5;
         this.roll.pickedItem = null;
         this.passedLevel = false;
